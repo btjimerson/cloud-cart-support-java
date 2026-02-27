@@ -1,11 +1,12 @@
 # Cloud Cart Support
 
-A multi-agent AI customer service system built with Spring Boot and Spring AI. Uses Claude to intelligently route and handle customer inquiries across specialized domain agents for orders, products, returns, and complaints.
+A distributed multi-agent AI customer service system built with Spring Boot, Spring AI, and the Model Context Protocol (MCP). Uses Claude to intelligently route and handle customer inquiries across specialized domain agents backed by independent microservices.
 
 ## Table of Contents
 
 - [Background](#background)
 - [Architecture](#architecture)
+- [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Install](#install)
 - [Usage](#usage)
@@ -15,13 +16,14 @@ A multi-agent AI customer service system built with Spring Boot and Spring AI. U
 
 ## Background
 
-Cloud Cart Support demonstrates a multi-agent architecture for AI-powered customer service. A router agent classifies incoming customer messages by intent and delegates them to the appropriate specialist agent. Each agent has access to domain-specific tools and can perform actions such as looking up orders, searching products, processing returns, and handling complaints.
+Cloud Cart Support demonstrates a distributed multi-agent architecture for AI-powered customer service. A router agent classifies incoming customer messages by intent and delegates them to the appropriate specialist agent. Each agent discovers and calls domain-specific tools exposed by independent MCP server microservices over Streamable HTTP transport.
 
 Key features:
 
 - **Intent-based routing** -- A router agent classifies messages and hands off to specialist agents with full conversation context.
 - **Guardrails** -- Input screening detects and redacts PII (SSN, credit card, email, phone) and blocks off-topic content before it reaches any agent.
-- **Tool use** -- Agents call structured tool functions (order lookup, product search, customer management, notifications) backed by a database.
+- **MCP tool discovery** -- Agents call tools exposed by remote MCP server services, discovered automatically via the Spring AI MCP client.
+- **Microservice architecture** -- Each domain (catalog, orders, customers, notifications) runs as an independent Spring Boot service with its own database.
 - **WebSocket support** -- Real-time chat interface via WebSocket in addition to REST endpoints.
 - **Conversation context** -- Full conversation history, handoff tracking, and metadata are maintained across agent transfers.
 
@@ -40,19 +42,39 @@ The system is composed of:
 | **Product Agent** | Handles product search, recommendations, and availability |
 | **Returns Agent** | Handles return requests, refunds, and exchange questions |
 | **Complaint Agent** | Handles complaints, escalations, and service issues |
-| **Tool Services** | Order, product, customer, and notification tool functions |
-| **H2 Database** | In-memory database seeded with sample data |
+| **Catalog Service** | MCP server exposing product search, details, availability, and recommendation tools |
+| **Orders Service** | MCP server exposing order status, tracking, cancellation, and return tools |
+| **Customers Service** | MCP server exposing customer info, loyalty points, notes, and credit tools |
+| **Notifications Service** | MCP server exposing email, SMS, ticket, and escalation tools |
 | **Anthropic Claude API** | LLM backing all agent reasoning and tool use |
+
+## Project Structure
+
+This is a Maven multi-module monorepo:
+
+```
+cloud-cart-support/
+├── pom.xml                    # Parent aggregator POM
+├── docker-compose.yaml        # Run all services together
+├── support-service/           # Orchestrator (agents, routing, frontend) - port 8080
+├── catalog-service/           # MCP server: product tools - port 8081
+├── orders-service/            # MCP server: order tools - port 8082
+├── customers-service/         # MCP server: customer tools - port 8083
+└── notifications-service/     # MCP server: notification tools - port 8084
+```
+
+Each MCP server service owns its data and exposes tools via Streamable HTTP transport using `spring-ai-starter-mcp-server-webflux`. The orchestrator (`support-service`) connects to all MCP servers as a client and routes discovered tools to the appropriate agents.
 
 ## Prerequisites
 
 - Java 21
-- Maven
+- Maven (or use the included Maven wrapper)
+- Docker and Docker Compose (for containerized deployment)
 - An [Anthropic API key](https://console.anthropic.com/)
 
 ## Install
 
-Clone the repository and build with Maven:
+Clone the repository and build all modules:
 
 ```sh
 git clone <repository-url>
@@ -62,16 +84,33 @@ cd cloud-cart-support
 
 ## Usage
 
-Set your Anthropic API key and start the application:
+### Running with Docker Compose
+
+The simplest way to run all services together:
 
 ```sh
 export ANTHROPIC_API_KEY=your-api-key
-./mvnw spring-boot:run
+docker compose up --build
 ```
 
-The application starts on `http://localhost:8080`.
+### Running locally
 
-Open the web UI in a browser to chat with the support agents, or use the REST API directly.
+Start each MCP server service, then start the orchestrator:
+
+```sh
+export ANTHROPIC_API_KEY=your-api-key
+
+# Start MCP server services (each in a separate terminal)
+./mvnw -pl catalog-service spring-boot:run
+./mvnw -pl orders-service spring-boot:run
+./mvnw -pl customers-service spring-boot:run
+./mvnw -pl notifications-service spring-boot:run
+
+# Start the orchestrator
+./mvnw -pl support-service spring-boot:run
+```
+
+The orchestrator starts on `http://localhost:8080`. Open the web UI in a browser to chat with the support agents, or use the REST API directly.
 
 ### Example
 

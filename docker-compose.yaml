@@ -1,0 +1,46 @@
+services:
+  catalog-service:
+    build:
+      context: .
+      dockerfile: catalog-service/Dockerfile
+    ports:
+      - "8081:8080"
+
+  orders-service:
+    build:
+      context: .
+      dockerfile: orders-service/Dockerfile
+    ports:
+      - "8082:8080"
+
+  customers-service:
+    build:
+      context: .
+      dockerfile: customers-service/Dockerfile
+    ports:
+      - "8083:8080"
+
+  notifications-service:
+    build:
+      context: .
+      dockerfile: notifications-service/Dockerfile
+    ports:
+      - "8084:8080"
+
+  support:
+    build:
+      context: .
+      dockerfile: support-service/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - catalog-service
+      - orders-service
+      - customers-service
+      - notifications-service
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      CATALOG_SERVICE_URL: http://catalog-service:8080
+      ORDERS_SERVICE_URL: http://orders-service:8080
+      CUSTOMERS_SERVICE_URL: http://customers-service:8080
+      NOTIFICATIONS_SERVICE_URL: http://notifications-service:8080

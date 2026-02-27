@@ -1,0 +1,32 @@
+name: generate-architecture
+on:
+  push:
+    paths:
+      - 'docs/architecture.md'
+permissions:
+  contents: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install mermaid-cli
+        run: npm install -g @mermaid-js/mermaid-cli
+      - name: Extract mermaid source
+        run: sed -n '/^```mermaid$/,/^```$/{ /^```/d; p }' docs/architecture.md > /tmp/architecture.mmd
+      - name: Generate PNG
+        run: |
+          echo '{"args":["--no-sandbox"]}' > /tmp/puppeteer-config.json
+          mmdc -i /tmp/architecture.mmd -o /tmp/cloud-cart-support-architecture.png -b transparent -p /tmp/puppeteer-config.json
+      - name: Copy to output locations
+        run: |
+          mkdir -p images
+          cp /tmp/cloud-cart-support-architecture.png images/cloud-cart-support-architecture.png
+      - name: Commit generated images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add images/cloud-cart-support-architecture.png
+          git diff --cached --quiet || git commit -m "Generate architecture diagram PNG from mermaid source"
+          git push
