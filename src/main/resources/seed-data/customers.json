@@ -1,0 +1,118 @@
+[
+  {
+    "id": "CUST-001",
+    "name": "Sarah Johnson",
+    "email": "sarah.johnson@email.com",
+    "loyalty_points": 2450,
+    "preferences": ["electronics", "fitness", "outdoor"],
+    "notes": [
+      "VIP customer since 2023",
+      "Prefers expedited shipping",
+      "Interested in new tech products"
+    ]
+  },
+  {
+    "id": "CUST-002",
+    "name": "Michael Chen",
+    "email": "m.chen@email.com",
+    "loyalty_points": 1820,
+    "preferences": ["kitchen", "home", "electronics"],
+    "notes": [
+      "Frequent buyer of kitchen appliances",
+      "Requested gift wrapping for recent orders"
+    ]
+  },
+  {
+    "id": "CUST-003",
+    "name": "Emily Rodriguez",
+    "email": "emily.r@email.com",
+    "loyalty_points": 890,
+    "preferences": ["outdoor", "fitness", "accessories"],
+    "notes": [
+      "Marathon runner - interested in fitness gear",
+      "Requested eco-friendly packaging"
+    ]
+  },
+  {
+    "id": "CUST-004",
+    "name": "James Wilson",
+    "email": "jwilson@email.com",
+    "loyalty_points": 3200,
+    "preferences": ["electronics", "tools", "automotive"],
+    "notes": [
+      "Top loyalty program member",
+      "Works from home - frequent electronics purchases",
+      "Prefers weekend deliveries"
+    ]
+  },
+  {
+    "id": "CUST-005",
+    "name": "Amanda Taylor",
+    "email": "amanda.taylor@email.com",
+    "loyalty_points": 1540,
+    "preferences": ["kitchen", "home", "accessories"],
+    "notes": [
+      "Recent homeowner",
+      "Interested in home improvement products"
+    ]
+  },
+  {
+    "id": "CUST-006",
+    "name": "David Park",
+    "email": "dpark@email.com",
+    "loyalty_points": 670,
+    "preferences": ["electronics", "outdoor"],
+    "notes": [
+      "Gaming enthusiast",
+      "Requested notifications for new gaming accessories"
+    ]
+  },
+  {
+    "id": "CUST-007",
+    "name": "Lisa Martinez",
+    "email": "lisa.martinez@email.com",
+    "loyalty_points": 2100,
+    "preferences": ["kitchen", "fitness", "home"],
+    "notes": [
+      "Professional chef",
+      "Interested in premium kitchen equipment",
+      "Provides detailed product reviews"
+    ]
+  },
+  {
+    "id": "CUST-008",
+    "name": "Robert Anderson",
+    "email": "r.anderson@email.com",
+    "loyalty_points": 450,
+    "preferences": ["outdoor", "tools", "automotive"],
+    "notes": [
+      "Weekend camping trips - regular outdoor gear purchases",
+      "Requested product recommendations"
+    ]
+  },
+  {
+    "id": "CUST-009",
+    "name": "Jessica Lee",
+    "email": "jlee@email.com",
+    "loyalty_points": 1980,
+    "preferences": ["electronics", "accessories", "home"],
+    "notes": [
+      "Tech blogger",
+      "Early adopter of new products",
+      "Subscribed to product launch notifications"
+    ]
+  },
+  {
+    "id": "CUST-010",
+    "name": "Thomas Brown",
+    "email": "thomas.brown@email.com",
+    "loyalty_points": 5100,
+    "preferences": ["electronics", "kitchen", "fitness", "tools"],
+    "notes": [
+      "Platinum loyalty member",
+      "Business owner - frequent bulk orders",
+      "Excellent payment history",
+      "Prefers invoicing option"
+    ]
+  }
+]

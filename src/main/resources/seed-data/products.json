@@ -1,0 +1,502 @@
+[
+  {
+    "id": 100,
+    "name": "Apple AirPods Pro (2nd Generation)",
+    "description": "Premium wireless earbuds featuring active noise cancellation, adaptive transparency mode, and personalized spatial audio. Up to 6 hours of listening time with MagSafe charging case.",
+    "price": 189.99,
+    "category": "electronics",
+    "image_url": "https://m.media-amazon.com/images/I/61SUj2aKoEL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 58
+  },
+  {
+    "id": 200,
+    "name": "Amazon Fire TV Stick 4K Max",
+    "description": "Powerful streaming media player with Wi-Fi 6E support, Alexa Voice Remote, and access to over 1.5 million movies and TV episodes. Supports Dolby Vision, HDR10+, and Dolby Atmos audio.",
+    "price": 39.99,
+    "category": "electronics",
+    "image_url": "https://m.media-amazon.com/images/I/51CgKGfMelL._AC_SL1000_.jpg",
+    "in_stock": true,
+    "stock_quantity": 92
+  },
+  {
+    "id": 300,
+    "name": "Anker USB C Charger 40W",
+    "description": "Dual-port USB-C wall charger with PowerIQ 3.0 technology delivering 20W per port. Compact foldable plug design, compatible with iPhone, Samsung Galaxy, iPad, and more.",
+    "price": 15.99,
+    "category": "electronics",
+    "image_url": "https://m.media-amazon.com/images/I/51LM3kwRNYL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 75
+  },
+  {
+    "id": 400,
+    "name": "Samsung Galaxy Buds FE",
+    "description": "Wireless earbuds with active noise cancellation, 3 microphones, and rich bass-forward sound. IPX2 water-resistant with up to 6 hours of battery life and touch controls.",
+    "price": 69.99,
+    "category": "electronics",
+    "image_url": "https://m.media-amazon.com/images/I/51bRHfV5JZL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 44
+  },
+  {
+    "id": 500,
+    "name": "Logitech C920x HD Pro Webcam",
+    "description": "Full HD 1080p webcam with dual stereo microphones and automatic light correction. Perfect for video calls, streaming, and recording with a 78-degree field of view.",
+    "price": 59.99,
+    "category": "electronics",
+    "image_url": "https://m.media-amazon.com/images/I/71iNwni9TsL._AC_SL1500_.jpg",
+    "in_stock": false,
+    "stock_quantity": 0
+  },
+  {
+    "id": 600,
+    "name": "Instant Pot Duo 7-in-1 Electric Pressure Cooker",
+    "description": "Versatile 6-quart programmable cooker that replaces 7 kitchen appliances: pressure cooker, slow cooker, rice cooker, steamer, saute pan, yogurt maker, and warmer. 13 one-touch programs.",
+    "price": 79.95,
+    "category": "kitchen",
+    "image_url": "https://m.media-amazon.com/images/I/71V1LdJMBAL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 37
+  },
+  {
+    "id": 700,
+    "name": "Ninja Professional Plus Blender",
+    "description": "1400-peak-watt motor blender with 72-oz total crushing pitcher, Auto-iQ technology, and four preset programs. Crushes ice, blends frozen fruits, and purees soups with ease.",
+    "price": 89.99,
+    "category": "kitchen",
+    "image_url": "https://m.media-amazon.com/images/I/61Bm5vJCYtL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 29
+  },
+  {
+    "id": 800,
+    "name": "Lodge 10.25 Inch Cast Iron Skillet",
+    "description": "Pre-seasoned cast iron skillet with unmatched heat retention and even heating. Oven safe to any temperature, works on all cooktops including induction. Made in the USA.",
+    "price": 19.90,
+    "category": "kitchen",
+    "image_url": "https://m.media-amazon.com/images/I/81QMeiCOJyL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 64
+  },
+  {
+    "id": 900,
+    "name": "Keurig K-Classic Coffee Maker",
+    "description": "Single-serve K-Cup pod coffee maker with a 48-oz water reservoir, multiple brew sizes (6, 8, 10 oz), and auto-off feature. Brews a fresh cup in under a minute.",
+    "price": 79.99,
+    "category": "kitchen",
+    "image_url": "https://m.media-amazon.com/images/I/81NVaVVWGGL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 41
+  },
+  {
+    "id": 1000,
+    "name": "OXO Good Grips 11-Piece Everyday Kitchen Tool Set",
+    "description": "Complete cooking utensil set including tongs, spatula, ladle, spoon, and more. Soft, non-slip handles and heat-resistant nylon heads safe for nonstick cookware.",
+    "price": 49.99,
+    "category": "kitchen",
+    "image_url": "https://m.media-amazon.com/images/I/71lBo3ZXJFL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 53
+  },
+  {
+    "id": 1100,
+    "name": "Stanley Quencher H2.0 FlowState Tumbler 40 oz",
+    "description": "Double-wall vacuum insulated tumbler that keeps drinks cold for 11 hours and iced for 2 days. Features a rotating three-position lid and ergonomic handle. Dishwasher safe.",
+    "price": 35.00,
+    "category": "sports",
+    "image_url": "https://m.media-amazon.com/images/I/71YiJGCYVkL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 88
+  },
+  {
+    "id": 1200,
+    "name": "Fitbit Charge 6 Fitness Tracker",
+    "description": "Advanced fitness tracker with built-in GPS, heart rate monitoring, sleep tracking, and 40+ exercise modes. 7-day battery life and water-resistant to 50 meters.",
+    "price": 99.95,
+    "category": "sports",
+    "image_url": "https://m.media-amazon.com/images/I/71RJROz6BmL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 31
+  },
+  {
+    "id": 1300,
+    "name": "Manduka PRO Yoga Mat 71-Inch",
+    "description": "Professional-grade 6mm thick yoga mat with dense cushioning and superior joint protection. Closed-cell surface prevents sweat from seeping in. Lifetime guarantee.",
+    "price": 92.00,
+    "category": "sports",
+    "image_url": "https://m.media-amazon.com/images/I/71MLHIY3fCL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 22
+  },
+  {
+    "id": 1400,
+    "name": "Under Armour Adult Hustle 5.0 Backpack",
+    "description": "Durable water-repellent backpack with UA Storm technology, soft-lined laptop sleeve fitting up to 15-inch laptops, and multiple organization pockets. Ergonomic shoulder straps.",
+    "price": 40.00,
+    "category": "sports",
+    "image_url": "https://m.media-amazon.com/images/I/81liiNS2vFL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 47
+  },
+  {
+    "id": 1500,
+    "name": "Speedo Unisex Adult Swim Goggles Vanquisher 2.0",
+    "description": "Competition swim goggles with panoramic anti-fog lens for clear wide vision. UV protection, flexible silicone seal, and speed-fit clip for easy adjustment.",
+    "price": 14.99,
+    "category": "sports",
+    "image_url": "https://m.media-amazon.com/images/I/71bKSN7jDgL._AC_SL1500_.jpg",
+    "in_stock": false,
+    "stock_quantity": 0
+  },
+  {
+    "id": 1600,
+    "name": "Maybelline Lash Sensational Sky High Mascara",
+    "description": "Lengthening and volumizing mascara with a flex tower brush for reaching every lash. Buildable formula delivers a full fan-out effect without clumping. Washable formula.",
+    "price": 8.98,
+    "category": "beauty",
+    "image_url": "https://m.media-amazon.com/images/I/61jT76ZSMPL._SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 95
+  },
+  {
+    "id": 1700,
+    "name": "CeraVe Moisturizing Cream",
+    "description": "Rich, non-greasy moisturizer with 3 essential ceramides and hyaluronic acid. Developed with dermatologists, fragrance-free and suitable for dry to very dry skin. 19-oz jar.",
+    "price": 16.08,
+    "category": "beauty",
+    "image_url": "https://m.media-amazon.com/images/I/61S7BrCBj7L._SL1000_.jpg",
+    "in_stock": true,
+    "stock_quantity": 72
+  },
+  {
+    "id": 1800,
+    "name": "Revlon One-Step Volumizer PLUS Hair Dryer and Styler",
+    "description": "2-in-1 hair dryer and volumizer hot air brush that delivers salon-worthy blowouts at home. Ionic technology reduces frizz while the oval brush design smooths hair.",
+    "price": 27.09,
+    "category": "beauty",
+    "image_url": "https://m.media-amazon.com/images/I/71sR-CcANyL._SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 38
+  },
+  {
+    "id": 1900,
+    "name": "Neutrogena Hydro Boost Water Gel Moisturizer",
+    "description": "Lightweight water-gel face moisturizer with hyaluronic acid that instantly quenches dry skin. Oil-free, non-comedogenic, and absorbs quickly for smooth, supple skin.",
+    "price": 16.97,
+    "category": "beauty",
+    "image_url": "https://m.media-amazon.com/images/I/71TDSxracML._SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 61
+  },
+  {
+    "id": 2000,
+    "name": "Olaplex No. 3 Hair Perfector",
+    "description": "At-home bond-building treatment that reduces breakage, strengthens hair, and restores healthy appearance. Patented technology works on all hair types for visibly stronger, shinier hair.",
+    "price": 28.00,
+    "category": "beauty",
+    "image_url": "https://m.media-amazon.com/images/I/61dMUEHHJnL._SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 26
+  },
+  {
+    "id": 2100,
+    "name": "LEGO Classic Large Creative Brick Box",
+    "description": "790-piece building set with 33 different colors of LEGO bricks in a convenient storage box. Includes windows, doors, wheels, eyes, and a green baseplate for endless creative building.",
+    "price": 42.49,
+    "category": "toys",
+    "image_url": "https://m.media-amazon.com/images/I/81dMfHJfMLL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 33
+  },
+  {
+    "id": 2200,
+    "name": "Play-Doh Modeling Compound 10-Pack",
+    "description": "Set of 10 two-ounce cans of classic Play-Doh in assorted colors. Non-toxic modeling compound for creative play, squishing, and shaping. Ages 2 and up.",
+    "price": 7.99,
+    "category": "toys",
+    "image_url": "https://m.media-amazon.com/images/I/81TmhQMIKSL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 84
+  },
+  {
+    "id": 2300,
+    "name": "Monopoly Classic Board Game",
+    "description": "The classic family board game of buying, selling, and trading properties. Includes game board, 8 tokens, 28 title deed cards, play money, and dice. For 2-8 players ages 8+.",
+    "price": 19.82,
+    "category": "toys",
+    "image_url": "https://m.media-amazon.com/images/I/81gC7lijTVL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 51
+  },
+  {
+    "id": 2400,
+    "name": "Magna-Tiles Clear Colors 100-Piece Set",
+    "description": "Magnetic building tiles in translucent colors for open-ended creative play. STEM-approved toy that develops spatial awareness and fine motor skills. Compatible with all Magna-Tiles sets.",
+    "price": 89.99,
+    "category": "toys",
+    "image_url": "https://m.media-amazon.com/images/I/81vdBqRCQKL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 14
+  },
+  {
+    "id": 2500,
+    "name": "Hot Wheels 20-Car Pack",
+    "description": "Set of 20 die-cast Hot Wheels vehicles in 1:64 scale with authentic decos and cool designs. Great for racing, collecting, and imaginative play. Styles may vary.",
+    "price": 21.99,
+    "category": "toys",
+    "image_url": "https://m.media-amazon.com/images/I/81G1Dp5J8HL._AC_SL1500_.jpg",
+    "in_stock": false,
+    "stock_quantity": 0
+  },
+  {
+    "id": 2600,
+    "name": "iRobot Roomba 694 Robot Vacuum",
+    "description": "Wi-Fi connected robot vacuum with personalized cleaning suggestions. 3-stage cleaning system lifts dirt, debris, and pet hair from carpets and hard floors. Works with Alexa.",
+    "price": 179.99,
+    "category": "home",
+    "image_url": "https://m.media-amazon.com/images/I/71yFhIbaYZL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 19
+  },
+  {
+    "id": 2700,
+    "name": "Yankee Candle Large Jar Candle - Vanilla Cupcake",
+    "description": "Premium soy-wax blend candle with rich vanilla cupcake fragrance. Burns for up to 150 hours with a natural fiber wick for consistent scent throw throughout the room.",
+    "price": 16.88,
+    "category": "home",
+    "image_url": "https://m.media-amazon.com/images/I/71dVGhDaz6L._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 67
+  },
+  {
+    "id": 2800,
+    "name": "Beckham Hotel Collection Bed Pillows (2-Pack)",
+    "description": "Premium gel-filled pillows with fade and stain-resistant cover. Luxuriously soft with gel fiber filling for optimal comfort and support. Machine washable, queen size.",
+    "price": 49.99,
+    "category": "home",
+    "image_url": "https://m.media-amazon.com/images/I/71kz7-HBXBL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 55
+  },
+  {
+    "id": 2900,
+    "name": "Govee Smart LED Strip Lights 65.6ft",
+    "description": "Wi-Fi RGB LED strip lights with app control, music sync, and Alexa/Google Assistant compatibility. 16 million colors and 64 scene modes for room decoration.",
+    "price": 29.99,
+    "category": "home",
+    "image_url": "https://m.media-amazon.com/images/I/71IYEajOtCL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 73
+  },
+  {
+    "id": 3000,
+    "name": "Utopia Towels Cotton Bath Towels Set (8-Pack)",
+    "description": "100% ring-spun cotton towels including 2 bath towels, 2 hand towels, and 4 washcloths. Soft, absorbent, and quick-drying. Machine washable and tumble dry friendly.",
+    "price": 29.99,
+    "category": "home",
+    "image_url": "https://m.media-amazon.com/images/I/91hVSEo5XML._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 42
+  },
+  {
+    "id": 3100,
+    "name": "IRIS USA Top Entry Cat Litter Box",
+    "description": "Enclosed top-entry litter box with grooved lid that catches litter from paws. Large interior space with rounded corners for easy cleaning. Includes scoop.",
+    "price": 21.99,
+    "category": "pets",
+    "image_url": "https://m.media-amazon.com/images/I/71T5p1D4KiL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 39
+  },
+  {
+    "id": 3200,
+    "name": "KONG Classic Dog Toy, Large",
+    "description": "Ultra-durable natural rubber dog toy with unpredictable bounce for interactive play. Hollow center can be stuffed with treats for extended engagement. Veterinarian recommended.",
+    "price": 13.99,
+    "category": "pets",
+    "image_url": "https://m.media-amazon.com/images/I/71EQrmEMypL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 81
+  },
+  {
+    "id": 3300,
+    "name": "Purina Pro Plan High Protein Dog Food",
+    "description": "Premium dry dog food with real chicken as the first ingredient. Formulated with probiotics for digestive and immune health. 35-pound bag for adult dogs.",
+    "price": 54.48,
+    "category": "pets",
+    "image_url": "https://m.media-amazon.com/images/I/71Wxi-ABl4L._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 28
+  },
+  {
+    "id": 3400,
+    "name": "Furminator Undercoat deShedding Tool for Dogs",
+    "description": "Professional grooming tool that reaches through topcoat to safely remove loose undercoat hair. Stainless steel edge, ergonomic handle, and FURejector button for easy hair release.",
+    "price": 24.52,
+    "category": "pets",
+    "image_url": "https://m.media-amazon.com/images/I/81i7FpW0JjL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 36
+  },
+  {
+    "id": 3500,
+    "name": "PetSafe Easy Walk Dog Harness",
+    "description": "No-pull dog harness with front chest leash attachment that naturally discourages pulling. Padded belly strap for comfort and quick-snap buckles for easy on/off. Medium size.",
+    "price": 22.95,
+    "category": "pets",
+    "image_url": "https://m.media-amazon.com/images/I/71HQ+2rmqeL._AC_SL1500_.jpg",
+    "in_stock": false,
+    "stock_quantity": 0
+  },
+  {
+    "id": 3600,
+    "name": "Sharpie Permanent Markers 24-Count Pack",
+    "description": "Assorted color fine-point permanent markers with quick-drying, fade-resistant ink. Bold writing on most surfaces including plastic, metal, and glass. AP certified non-toxic.",
+    "price": 14.47,
+    "category": "office",
+    "image_url": "https://m.media-amazon.com/images/I/81vb5bN3YUL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 97
+  },
+  {
+    "id": 3700,
+    "name": "AmazonBasics Mesh Desk Organizer",
+    "description": "5-compartment desktop organizer with mesh construction for optimal ventilation. Includes drawer, pen holder, and file sections. Keeps workspace tidy and supplies accessible.",
+    "price": 15.29,
+    "category": "office",
+    "image_url": "https://m.media-amazon.com/images/I/81SGbF5FSEL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 48
+  },
+  {
+    "id": 3800,
+    "name": "HP 63 Original Ink Cartridge Combo (Black & Tri-Color)",
+    "description": "Genuine HP ink cartridge 2-pack with black and tri-color cartridges. Produces sharp text and vivid graphics. Compatible with HP DeskJet, ENVY, and OfficeJet printers.",
+    "price": 37.89,
+    "category": "office",
+    "image_url": "https://m.media-amazon.com/images/I/71tn5lISdwL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 24
+  },
+  {
+    "id": 3900,
+    "name": "Post-it Super Sticky Notes 15-Pad Pack",
+    "description": "Brightly colored 3x3 inch sticky notes with 2X the sticking power. Stick securely to more surfaces and remove cleanly. 15 pads, 45 sheets per pad.",
+    "price": 18.98,
+    "category": "office",
+    "image_url": "https://m.media-amazon.com/images/I/81XGWN0+mHL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 70
+  },
+  {
+    "id": 4000,
+    "name": "Swingline Stapler, 747 Classic Desktop",
+    "description": "All-metal construction desktop stapler with open channel loading and non-skid rubber base. Staples up to 20 sheets at a time. Built to last with die-cast metal design.",
+    "price": 12.49,
+    "category": "office",
+    "image_url": "https://m.media-amazon.com/images/I/61GYJLS62+L._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 56
+  },
+  {
+    "id": 4100,
+    "name": "Chemical Guys Car Wash Soap and Shampoo",
+    "description": "Premium car wash concentrate with high-foaming formula that safely lifts dirt and grime without stripping wax or sealant. pH balanced and biodegradable. 16-oz bottle.",
+    "price": 9.97,
+    "category": "automotive",
+    "image_url": "https://m.media-amazon.com/images/I/81vfGADTvTL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 83
+  },
+  {
+    "id": 4200,
+    "name": "NOCO Boost Plus GB40 Jump Starter",
+    "description": "1000-amp portable lithium-ion car battery jump starter for up to 6-liter gas and 3-liter diesel engines. Features USB power bank, LED flashlight, and compact design.",
+    "price": 99.95,
+    "category": "automotive",
+    "image_url": "https://m.media-amazon.com/images/I/71C5IKTH9TL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 27
+  },
+  {
+    "id": 4300,
+    "name": "Armor All Car Interior Cleaner Wipes (50-Count)",
+    "description": "Pre-moistened cleaning wipes that safely remove dust, dirt, and grime from dashboards, consoles, door panels, and steering wheels. Leaves a matte finish without greasy residue.",
+    "price": 6.97,
+    "category": "automotive",
+    "image_url": "https://m.media-amazon.com/images/I/81dAm85DLNL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 66
+  },
+  {
+    "id": 4400,
+    "name": "Meguiar's Ultimate Liquid Wax",
+    "description": "Advanced synthetic polymer wax that provides long-lasting protection and a brilliant high-gloss finish. Easy to apply and remove with ThinFilm technology. 16-oz bottle.",
+    "price": 18.47,
+    "category": "automotive",
+    "image_url": "https://m.media-amazon.com/images/I/81O-YL9YorL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 35
+  },
+  {
+    "id": 4500,
+    "name": "Garmin Dash Cam Mini 2",
+    "description": "Ultra-compact dash camera with 1080p HD recording, 140-degree field of view, and voice control. Features cloud connectivity, incident detection, and parking surveillance mode.",
+    "price": 119.99,
+    "category": "automotive",
+    "image_url": "https://m.media-amazon.com/images/I/61sFVHe8YaL._AC_SL1500_.jpg",
+    "in_stock": false,
+    "stock_quantity": 0
+  },
+  {
+    "id": 4600,
+    "name": "DEWALT 20V MAX Cordless Drill/Driver Kit",
+    "description": "Compact and lightweight drill/driver with 300 unit watts of power, 2-speed transmission (0-450/0-1500 RPM), and 1/2-inch ratcheting chuck. Includes battery, charger, and kit bag.",
+    "price": 99.00,
+    "category": "tools",
+    "image_url": "https://m.media-amazon.com/images/I/71FBPQz0a8L._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 41
+  },
+  {
+    "id": 4700,
+    "name": "CRAFTSMAN Mechanics Tool Set (230-Piece)",
+    "description": "Comprehensive mechanics tool set with 72-tooth ratchets, SAE and metric sockets, combination wrenches, and hex keys. Chrome finish for corrosion resistance. Includes hard case.",
+    "price": 149.00,
+    "category": "tools",
+    "image_url": "https://m.media-amazon.com/images/I/81xdNJkMIqL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 16
+  },
+  {
+    "id": 4800,
+    "name": "Gorilla Heavy Duty Construction Adhesive",
+    "description": "All-purpose construction adhesive with 100% tough strength for indoor and outdoor projects. Bonds wood, stone, metal, ceramic, and more. Water-resistant and paintable.",
+    "price": 5.97,
+    "category": "tools",
+    "image_url": "https://m.media-amazon.com/images/I/71QAa9OJh3L._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 89
+  },
+  {
+    "id": 4900,
+    "name": "Milwaukee 25ft Compact Tape Measure",
+    "description": "Heavy-duty tape measure with EXO360 blade technology and nylon bond coating. Features a compact frame, magnetic tip, and finger stop for one-handed operation.",
+    "price": 19.97,
+    "category": "tools",
+    "image_url": "https://m.media-amazon.com/images/I/71-xjbWoLFL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 62
+  },
+  {
+    "id": 5000,
+    "name": "BLACK+DECKER Random Orbit Sander",
+    "description": "Compact 2-amp orbital sander with 12,000 OPM for smooth finishing on wood, metal, and plastic. Hook-and-loop system for easy paper changes. Includes dust collection bag.",
+    "price": 29.97,
+    "category": "tools",
+    "image_url": "https://m.media-amazon.com/images/I/71j1IXcjJBL._AC_SL1500_.jpg",
+    "in_stock": true,
+    "stock_quantity": 30
+  }
+]

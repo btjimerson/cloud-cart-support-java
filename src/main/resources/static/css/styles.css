@@ -1,0 +1,388 @@
+/* Global Styles */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Navbar - CloudCart brand color */
+.am-navbar {
+    background-color: #053B52;
+}
+
+.navbar-logo {
+    height: 48px;
+}
+
+.welcome-logo {
+    height: 256px;
+}
+
+/* Layout */
+.main-content {
+    min-height: 0;
+}
+
+.chat-area {
+    min-height: 0;
+    min-width: 0;
+}
+
+.input-area {
+    flex-shrink: 0;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 25%;
+    flex-shrink: 0;
+    max-height: calc(100vh - 56px);
+    overflow-y: auto;
+    background-color: #f8f9fa;
+}
+
+.sidebar-heading {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+}
+
+.handoff-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.handoff-item {
+    padding: 8px;
+    margin-bottom: 8px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    border: 1px solid #dee2e6;
+}
+
+.handoff-item .time {
+    color: #6c757d;
+    font-size: 0.75rem;
+}
+
+/* Chat Messages */
+#chat-messages {
+    background-color: #ffffff;
+    scroll-behavior: smooth;
+}
+
+.message {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+.message.user {
+    flex-direction: row-reverse;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    word-wrap: break-word;
+}
+
+.message.user .message-bubble {
+    background-color: #053B52;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.message.assistant .message-bubble {
+    background-color: #e9ecef;
+    color: #212529;
+    border-bottom-left-radius: 4px;
+}
+
+.agent-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin-bottom: 4px;
+    display: inline-block;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.message.assistant .message-header {
+    margin-bottom: 4px;
+}
+
+/* Agent Badge Colors */
+.agent-router {
+    background-color: #6c757d;
+    color: white;
+}
+
+.agent-order {
+    background-color: #053B52;
+    color: white;
+}
+
+.agent-product {
+    background-color: #198754;
+    color: white;
+}
+
+.agent-returns {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.agent-complaint {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Markdown content in assistant messages */
+.message.assistant .message-bubble p:first-child {
+    margin-top: 0;
+}
+
+.message.assistant .message-bubble p:last-child {
+    margin-bottom: 0;
+}
+
+.message.assistant .message-bubble h1,
+.message.assistant .message-bubble h2,
+.message.assistant .message-bubble h3,
+.message.assistant .message-bubble h4 {
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.message.assistant .message-bubble h1:first-child,
+.message.assistant .message-bubble h2:first-child,
+.message.assistant .message-bubble h3:first-child,
+.message.assistant .message-bubble h4:first-child {
+    margin-top: 0;
+}
+
+.message.assistant .message-bubble h1 { font-size: 1.15rem; }
+.message.assistant .message-bubble h2 { font-size: 1.05rem; }
+.message.assistant .message-bubble h3 { font-size: 0.95rem; }
+.message.assistant .message-bubble h4 { font-size: 0.9rem; }
+
+.message.assistant .message-bubble ul,
+.message.assistant .message-bubble ol {
+    margin: 0.4rem 0;
+    padding-left: 1.4rem;
+}
+
+.message.assistant .message-bubble li {
+    margin-bottom: 0.2rem;
+}
+
+.message.assistant .message-bubble strong {
+    font-weight: 600;
+}
+
+.message.assistant .message-bubble code {
+    background-color: rgba(0, 0, 0, 0.06);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+.message.assistant .message-bubble pre {
+    background-color: rgba(0, 0, 0, 0.06);
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 0.5rem 0;
+}
+
+.message.assistant .message-bubble pre code {
+    background: none;
+    padding: 0;
+}
+
+.message.assistant .message-bubble hr {
+    margin: 0.6rem 0;
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+.message.assistant .message-bubble table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    font-size: 0.9em;
+}
+
+.message.assistant .message-bubble th,
+.message.assistant .message-bubble td {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    padding: 0.35rem 0.6rem;
+    text-align: left;
+}
+
+.message.assistant .message-bubble th {
+    background-color: rgba(0, 0, 0, 0.04);
+    font-weight: 600;
+}
+
+/* Product Images in chat */
+.message.assistant .message-bubble img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    margin: 8px 0;
+    object-fit: contain;
+    display: block;
+}
+
+/* Tool Calls */
+.tool-calls {
+    margin-top: 8px;
+    max-width: 70%;
+}
+
+.message.user .tool-calls {
+    margin-left: auto;
+}
+
+.tool-call-header {
+    cursor: pointer;
+    user-select: none;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tool-call-header:hover {
+    background-color: #e9ecef;
+}
+
+.tool-call-content {
+    padding: 12px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.tool-call-collapsed .tool-call-content {
+    display: none;
+}
+
+.tool-call-icon {
+    transition: transform 0.2s;
+}
+
+.tool-call-collapsed .tool-call-icon {
+    transform: rotate(-90deg);
+}
+
+/* System Messages (Handoffs) */
+.system-message {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.system-message-content {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #e8f4f8;
+    border: 1px solid #a8d5e2;
+    border-radius: 12px;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: #053B52;
+}
+
+/* Input Area */
+.example-prompt {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-color: #053B52;
+    color: #053B52;
+}
+
+.example-prompt:hover {
+    background-color: #053B52;
+    border-color: #053B52;
+    color: white;
+}
+
+#message-input {
+    border-radius: 24px;
+    padding: 10px 16px;
+}
+
+#message-input:focus {
+    border-color: #053B52;
+    box-shadow: 0 0 0 0.2rem rgba(5, 59, 82, 0.25);
+}
+
+#send-button {
+    border-radius: 24px;
+    padding: 10px 20px;
+    background-color: #053B52;
+    border-color: #053B52;
+}
+
+#send-button:hover {
+    background-color: #064a66;
+    border-color: #064a66;
+}
+
+/* Connection Status */
+#connection-status i {
+    font-size: 0.6rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+
+    .message-bubble {
+        max-width: 85%;
+    }
+
+    .tool-calls {
+        max-width: 85%;
+    }
+
+    .example-prompt {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
