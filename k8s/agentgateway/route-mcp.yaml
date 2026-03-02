@@ -1,0 +1,28 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: mcp-route
+  namespace: agentgateway-system
+spec:
+  parentRefs:
+    - name: enterprise-agentgateway-proxy
+      namespace: agentgateway-system
+      sectionName: mcp
+  rules:
+    - backendRefs:
+        - name: catalog-mcp
+          namespace: agentgateway-system
+          group: agentgateway.dev
+          kind: AgentgatewayBackend
+        - name: orders-mcp
+          namespace: agentgateway-system
+          group: agentgateway.dev
+          kind: AgentgatewayBackend
+        - name: customers-mcp
+          namespace: agentgateway-system
+          group: agentgateway.dev
+          kind: AgentgatewayBackend
+        - name: notifications-mcp
+          namespace: agentgateway-system
+          group: agentgateway.dev
+          kind: AgentgatewayBackend

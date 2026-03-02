@@ -1,0 +1,51 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: catalog-mcp
+  namespace: agentgateway-system
+spec:
+  mcp:
+    targets:
+      - name: catalog-service
+        static:
+          host: catalog-service.cloud-cart.svc
+          port: 8080
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: orders-mcp
+  namespace: agentgateway-system
+spec:
+  mcp:
+    targets:
+      - name: orders-service
+        static:
+          host: orders-service.cloud-cart.svc
+          port: 8080
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: customers-mcp
+  namespace: agentgateway-system
+spec:
+  mcp:
+    targets:
+      - name: customers-service
+        static:
+          host: customers-service.cloud-cart.svc
+          port: 8080
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: notifications-mcp
+  namespace: agentgateway-system
+spec:
+  mcp:
+    targets:
+      - name: notifications-service
+        static:
+          host: notifications-service.cloud-cart.svc
+          port: 8080
