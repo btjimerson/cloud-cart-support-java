@@ -39,8 +39,4 @@ services:
       - customers-service
       - notifications-service
     environment:
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      CATALOG_SERVICE_URL: http://catalog-service:8080
-      ORDERS_SERVICE_URL: http://orders-service:8080
-      CUSTOMERS_SERVICE_URL: http://customers-service:8080
-      NOTIFICATIONS_SERVICE_URL: http://notifications-service:8080
+      MCP_GATEWAY_URL: http://agentgateway:15000

@@ -14,14 +14,10 @@ spring:
       client:
         http:
           connections:
-            catalog-service:
-              url: ${CATALOG_SERVICE_URL:http://localhost:8081}
-            orders-service:
-              url: ${ORDERS_SERVICE_URL:http://localhost:8082}
-            customers-service:
-              url: ${CUSTOMERS_SERVICE_URL:http://localhost:8083}
-            notifications-service:
-              url: ${NOTIFICATIONS_SERVICE_URL:http://localhost:8084}
+            # Single connection to Agent Gateway's federated MCP endpoint.
+            # The gateway multiplexes tools from all 4 backend MCP servers.
+            agentgateway:
+              url: ${MCP_GATEWAY_URL:http://localhost:15000}
   datasource:
     url: jdbc:h2:mem:cloudcartsupport
     driver-class-name: org.h2.Driver
