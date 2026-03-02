@@ -6,6 +6,7 @@ import dev.snbv2.cloudcart.support.model.ConversationContext;
 import dev.snbv2.cloudcart.support.model.GuardrailResult;
 import dev.snbv2.cloudcart.support.service.ContextManager;
 import dev.snbv2.cloudcart.support.service.GuardrailService;
+import dev.snbv2.cloudcart.support.service.RateLimitService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ public class ChatController {
 
     private final ContextManager contextManager;
     private final GuardrailService guardrailService;
+    private final RateLimitService rateLimitService;
     private final RouterAgent routerAgent;
 
     /**
@@ -32,12 +34,14 @@ public class ChatController {
      *
      * @param contextManager   the manager responsible for creating and retrieving conversation contexts
      * @param guardrailService the service that applies input guardrails to user messages
+     * @param rateLimitService the service that enforces per-client request rate limits
      * @param routerAgent      the router agent that classifies intent and delegates to domain agents
      */
     public ChatController(ContextManager contextManager, GuardrailService guardrailService,
-                           RouterAgent routerAgent) {
+                           RateLimitService rateLimitService, RouterAgent routerAgent) {
         this.contextManager = contextManager;
         this.guardrailService = guardrailService;
+        this.rateLimitService = rateLimitService;
         this.routerAgent = routerAgent;
     }
 
@@ -81,6 +85,13 @@ public class ChatController {
 
         // Add user turn
         contextManager.addTurn(ctx.getConversationId(), "user", message, "", null);
+
+        // Enforce rate limit
+        String rateLimitKey = customerId.isBlank() ? ctx.getConversationId() : customerId;
+        if (!rateLimitService.tryAcquire(rateLimitKey)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(Map.of("error", "Rate limit exceeded. Please try again later."));
+        }
 
         // Apply guardrails
         GuardrailResult guardrailResult = guardrailService.apply(message);

@@ -6,6 +6,7 @@ import dev.snbv2.cloudcart.support.model.ConversationContext;
 import dev.snbv2.cloudcart.support.model.GuardrailResult;
 import dev.snbv2.cloudcart.support.service.ContextManager;
 import dev.snbv2.cloudcart.support.service.GuardrailService;
+import dev.snbv2.cloudcart.support.service.RateLimitService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private final ContextManager contextManager;
     private final GuardrailService guardrailService;
+    private final RateLimitService rateLimitService;
     private final RouterAgent routerAgent;
     private final ObjectMapper objectMapper;
 
@@ -40,13 +42,16 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      *
      * @param contextManager   the manager responsible for creating and retrieving conversation contexts
      * @param guardrailService the service that applies input guardrails to user messages
+     * @param rateLimitService the service that enforces per-client request rate limits
      * @param routerAgent      the router agent that classifies intent and delegates to domain agents
      * @param objectMapper     the Jackson object mapper for serializing and deserializing JSON messages
      */
     public ChatWebSocketHandler(ContextManager contextManager, GuardrailService guardrailService,
-                                 RouterAgent routerAgent, ObjectMapper objectMapper) {
+                                 RateLimitService rateLimitService, RouterAgent routerAgent,
+                                 ObjectMapper objectMapper) {
         this.contextManager = contextManager;
         this.guardrailService = guardrailService;
+        this.rateLimitService = rateLimitService;
         this.routerAgent = routerAgent;
         this.objectMapper = objectMapper;
     }
@@ -108,6 +113,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
         // Add user turn
         contextManager.addTurn(ctx.getConversationId(), "user", message, "", null);
+
+        // Enforce rate limit
+        String rateLimitKey = (customerId instanceof String && !((String) customerId).isBlank())
+                ? (String) customerId : ctx.getConversationId();
+        if (!rateLimitService.tryAcquire(rateLimitKey)) {
+            sendJson(session, Map.of("error", "Rate limit exceeded. Please try again later."));
+            return;
+        }
 
         // Apply guardrails
         GuardrailResult guardrailResult = guardrailService.apply(message);

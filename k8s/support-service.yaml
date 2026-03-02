@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: support-service
+  namespace: cloud-cart
+  labels:
+    app: support-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: support-service
+  template:
+    metadata:
+      labels:
+        app: support-service
+    spec:
+      containers:
+        - name: support-service
+          image: ghcr.io/btjimerson/cloud-cart-support/support-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: anthropic-api-key
+                  key: ANTHROPIC_API_KEY
+            - name: CATALOG_SERVICE_URL
+              value: "http://catalog-service.cloud-cart.svc:8080"
+            - name: ORDERS_SERVICE_URL
+              value: "http://orders-service.cloud-cart.svc:8080"
+            - name: CUSTOMERS_SERVICE_URL
+              value: "http://customers-service.cloud-cart.svc:8080"
+            - name: NOTIFICATIONS_SERVICE_URL
+              value: "http://notifications-service.cloud-cart.svc:8080"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: support-service
+  namespace: cloud-cart
+spec:
+  type: NodePort
+  selector:
+    app: support-service
+  ports:
+    - port: 8080
+      targetPort: 8080
