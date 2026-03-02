@@ -4,13 +4,12 @@ server:
 spring:
   ai:
     anthropic:
-      base-url: ${SPRING_AI_ANTHROPIC_BASE_URL:http://localhost:3000}
+      base-url: http://localhost:3000
       api-key: not-used
       chat:
         options:
-          # Model and max-tokens are enforced by Agent Gateway (overrides).
-          # This placeholder satisfies Spring AI's requirement for a model name.
-          model: placeholder
+          model: claude-sonnet-4-5-20250929
+          max-tokens: 4096
     mcp:
       client:
         http:
