@@ -8,6 +8,12 @@ import lombok.ToString;
 
 import java.time.Instant;
 
+/**
+ * JPA entity representing a return request for an order.
+ *
+ * <p>Maps to the {@code return_requests} table and tracks the reason,
+ * status, and creation timestamp of the return.</p>
+ */
 @Entity
 @Table(name = "return_requests")
 @Getter

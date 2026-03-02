@@ -10,6 +10,13 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * MCP tool methods for product catalog operations.
+ *
+ * <p>Provides AI-accessible tools for searching products, checking availability,
+ * retrieving product details, and generating recommendations. Search supports
+ * multi-term queries with basic stemming.</p>
+ */
 @Service
 public class CatalogTools {
 

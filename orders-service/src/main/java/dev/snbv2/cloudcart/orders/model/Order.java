@@ -10,6 +10,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * JPA entity representing a customer order.
+ *
+ * <p>Maps to the {@code orders} table and tracks order status, total amount,
+ * shipping details, and associated {@link OrderItem}s.</p>
+ */
 @Entity
 @Table(name = "orders")
 @Getter

@@ -8,6 +8,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * JPA entity representing a product in the catalog.
+ *
+ * <p>Maps to the {@code products} table and includes fields for name,
+ * description, price, category, stock status, and optional image URL.</p>
+ */
 @Entity
 @Table(name = "products")
 @Getter

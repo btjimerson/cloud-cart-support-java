@@ -8,6 +8,12 @@ import lombok.ToString;
 
 import java.time.Instant;
 
+/**
+ * JPA entity representing an issue escalation to a supervisor.
+ *
+ * <p>Maps to the {@code escalations} table and tracks the customer,
+ * reason for escalation, status, and creation timestamp.</p>
+ */
 @Entity
 @Table(name = "escalations")
 @Getter

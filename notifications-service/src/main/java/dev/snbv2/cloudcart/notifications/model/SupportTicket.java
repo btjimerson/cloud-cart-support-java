@@ -8,6 +8,12 @@ import lombok.ToString;
 
 import java.time.Instant;
 
+/**
+ * JPA entity representing a customer support ticket.
+ *
+ * <p>Maps to the {@code support_tickets} table and includes fields for
+ * subject, description, priority level, status, and creation timestamp.</p>
+ */
 @Entity
 @Table(name = "support_tickets")
 @Getter

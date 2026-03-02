@@ -13,6 +13,12 @@ import org.springframework.stereotype.Component;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * Seeds the product catalog database with initial data on application startup.
+ *
+ * <p>Reads product definitions from {@code seed-data/products.json} on the classpath
+ * and persists them via {@link ProductRepository}.</p>
+ */
 @Component
 @CommonsLog
 public class DataSeeder implements CommandLineRunner {

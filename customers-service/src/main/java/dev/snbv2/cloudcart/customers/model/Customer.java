@@ -8,6 +8,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * JPA entity representing a customer account.
+ *
+ * <p>Maps to the {@code customers} table and includes fields for contact info,
+ * loyalty points, tier level, and preferences.</p>
+ */
 @Entity
 @Table(name = "customers")
 @Getter

@@ -15,6 +15,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * MCP tool methods for notification and escalation operations.
+ *
+ * <p>Provides AI-accessible tools for sending email and SMS notifications,
+ * creating support tickets, and escalating issues to supervisors.</p>
+ */
 @Service
 @CommonsLog
 public class NotificationTools {

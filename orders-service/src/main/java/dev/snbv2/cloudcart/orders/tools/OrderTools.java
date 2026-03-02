@@ -11,6 +11,13 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+/**
+ * MCP tool methods for order management operations.
+ *
+ * <p>Provides AI-accessible tools for checking order status, tracking shipments,
+ * cancelling orders, evaluating return eligibility, initiating returns,
+ * and generating return shipping labels.</p>
+ */
 @Service
 public class OrderTools {
 

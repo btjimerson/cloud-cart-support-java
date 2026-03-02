@@ -6,6 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 
+/**
+ * Spring Data JPA repository for {@link Product} entities.
+ *
+ * <p>Provides product search by keyword and category, with case-insensitive
+ * matching on name and description fields.</p>
+ */
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     List<Product> findByCategory(String category);

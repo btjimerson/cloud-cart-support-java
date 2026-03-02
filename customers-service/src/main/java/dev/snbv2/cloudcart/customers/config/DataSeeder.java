@@ -14,6 +14,13 @@ import java.io.InputStream;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * Seeds the customers database with initial data on application startup.
+ *
+ * <p>Reads customer definitions from {@code seed-data/customers.json} on the classpath,
+ * including customer notes, and persists them via {@link CustomerRepository}
+ * and {@link CustomerNoteRepository}.</p>
+ */
 @Component
 @CommonsLog
 public class DataSeeder implements CommandLineRunner {

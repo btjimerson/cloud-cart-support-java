@@ -4,6 +4,11 @@ import dev.snbv2.cloudcart.notifications.model.SupportTicket;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
+/**
+ * Spring Data JPA repository for {@link SupportTicket} entities.
+ *
+ * <p>Supports lookup of support tickets by customer ID.</p>
+ */
 public interface SupportTicketRepository extends JpaRepository<SupportTicket, Long> {
 
     List<SupportTicket> findByCustomerId(String customerId);

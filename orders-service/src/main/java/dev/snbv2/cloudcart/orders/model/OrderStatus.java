@@ -1,5 +1,11 @@
 package dev.snbv2.cloudcart.orders.model;
 
+/**
+ * Enumeration of possible order lifecycle states.
+ *
+ * <p>Each status has a lowercase string value used for JSON serialization
+ * and database storage.</p>
+ */
 public enum OrderStatus {
     PENDING("pending"),
     CONFIRMED("confirmed"),

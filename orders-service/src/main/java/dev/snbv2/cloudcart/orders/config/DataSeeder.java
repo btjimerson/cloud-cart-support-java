@@ -14,6 +14,12 @@ import java.io.InputStream;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * Seeds the orders database with initial data on application startup.
+ *
+ * <p>Reads order definitions from {@code seed-data/orders.json} on the classpath,
+ * including order items, and persists them via {@link OrderRepository}.</p>
+ */
 @Component
 @CommonsLog
 public class DataSeeder implements CommandLineRunner {

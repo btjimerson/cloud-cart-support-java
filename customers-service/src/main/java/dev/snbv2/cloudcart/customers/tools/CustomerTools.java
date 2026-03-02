@@ -9,6 +9,13 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.*;
 
+/**
+ * MCP tool methods for customer management operations.
+ *
+ * <p>Provides AI-accessible tools for retrieving customer information,
+ * checking loyalty points and tiers, adding interaction notes, and
+ * issuing store credits as compensation.</p>
+ */
 @Service
 public class CustomerTools {
 

@@ -8,6 +8,12 @@ import lombok.ToString;
 
 import java.time.Instant;
 
+/**
+ * JPA entity representing an interaction note attached to a customer record.
+ *
+ * <p>Maps to the {@code customer_notes} table and stores timestamped notes
+ * created during customer support interactions.</p>
+ */
 @Entity
 @Table(name = "customer_notes")
 @Getter
