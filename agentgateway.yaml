@@ -9,6 +9,50 @@ binds:
           provider:
             anthropic:
               model: claude-sonnet-4-5-20250929
+          policies:
+            ai:
+              defaults:
+                temperature: 0.7
+              overrides:
+                max_tokens: 4096
+              promptGuard:
+                request:
+                - response:
+                    message: "I'm sorry, but I can't process that request. Please rephrase your message."
+                    statusCode: 403
+                  regex:
+                    action: REJECT
+                    matches:
+                    - "violence"
+                    - "weapon"
+                    - "drug"
+                    - "illegal"
+                    - "hack"
+                    - "exploit"
+                    - "kill"
+                    - "harm"
+                    - "steal"
+                    - "fraud"
+                    - "scam"
+                    - "phishing"
+                    - "porn"
+                    - "abuse"
+                    - "threat"
+                - regex:
+                    action: MASK
+                    builtins:
+                    - CreditCard
+                    - Ssn
+                    - Email
+                    - PhoneNumber
+                response:
+                - regex:
+                    action: MASK
+                    builtins:
+                    - CreditCard
+                    - Ssn
+                    - Email
+                    - PhoneNumber
       policies:
         backendAuth:
           key: "$ANTHROPIC_API_KEY"
