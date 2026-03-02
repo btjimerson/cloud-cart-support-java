@@ -56,3 +56,14 @@ binds:
       policies:
         backendAuth:
           key: "$ANTHROPIC_API_KEY"
+        localRateLimit:
+        # Request-based: allow 20 requests per minute (burst to 25)
+        - type: requests
+          maxTokens: 25
+          tokensPerFill: 20
+          fillInterval: 60s
+        # Token-based: allow 50,000 LLM tokens per hour
+        - type: tokens
+          maxTokens: 50000
+          tokensPerFill: 50000
+          fillInterval: 3600s
