@@ -1,13 +1,4 @@
 # yaml-language-server: $schema=https://agentgateway.dev/schema/config
-config:
-  # Prometheus metrics endpoint at localhost:9091/metrics
-  statsAddr: 0.0.0.0:9091
-  # OpenTelemetry tracing — export spans to a local OTLP collector
-  tracing:
-    otlpEndpoint: http://localhost:4317
-    otlpProtocol: grpc
-    randomSampling: 1.0
-
 binds:
 - port: 3000
   listeners:
