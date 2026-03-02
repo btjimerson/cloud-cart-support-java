@@ -6,7 +6,6 @@ import dev.snbv2.cloudcart.support.service.HandoffManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.ai.anthropic.AnthropicChatModel;
-import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -149,17 +148,12 @@ public class RouterAgent implements Agent {
      */
     private Map<String, Object> classifyIntent(String message) {
         try {
-            AnthropicChatOptions options = AnthropicChatOptions.builder()
-                    .model("claude-sonnet-4-5-20250929")
-                    .maxTokens(500)
-                    .build();
-
             List<Message> messages = List.of(
                     new SystemMessage(ROUTER_SYSTEM_PROMPT),
                     new UserMessage("Classify this message: " + message)
             );
 
-            ChatResponse response = chatModel.call(new Prompt(messages, options));
+            ChatResponse response = chatModel.call(new Prompt(messages));
             String text = response.getResult().getOutput().getText().trim();
 
             // Strip markdown code fences if present

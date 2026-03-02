@@ -103,8 +103,6 @@ public abstract class BaseToolAgent implements Agent {
                 .toList();
 
         AnthropicChatOptions options = AnthropicChatOptions.builder()
-                .model("claude-sonnet-4-5-20250929")
-                .maxTokens(4096)
                 .toolCallbacks(callbacks)
                 .toolNames(new HashSet<>(toolNames))
                 .build();

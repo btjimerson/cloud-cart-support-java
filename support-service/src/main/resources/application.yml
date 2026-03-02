@@ -8,8 +8,9 @@ spring:
       api-key: not-used
       chat:
         options:
-          model: claude-sonnet-4-5-20250929
-          max-tokens: 4096
+          # Model and max-tokens are enforced by Agent Gateway (overrides).
+          # This placeholder satisfies Spring AI's requirement for a model name.
+          model: placeholder
     mcp:
       client:
         http:

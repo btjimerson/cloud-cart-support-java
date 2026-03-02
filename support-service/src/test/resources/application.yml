@@ -1,0 +1,5 @@
+spring:
+  http:
+    client:
+      connect-timeout: 2s
+      read-timeout: 2s
