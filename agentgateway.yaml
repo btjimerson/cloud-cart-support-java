@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://agentgateway.dev/schema/config
+binds:
+- port: 3000
+  listeners:
+  - routes:
+    - backends:
+      - ai:
+          name: anthropic
+          provider:
+            anthropic:
+              model: claude-sonnet-4-5-20250929
+      policies:
+        backendAuth:
+          key: "$ANTHROPIC_API_KEY"
