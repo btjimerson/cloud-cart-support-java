@@ -3,9 +3,7 @@ package dev.snbv2.cloudcart.support.controller;
 import dev.snbv2.cloudcart.support.agent.RouterAgent;
 import dev.snbv2.cloudcart.support.model.AgentResponse;
 import dev.snbv2.cloudcart.support.model.ConversationContext;
-import dev.snbv2.cloudcart.support.model.GuardrailResult;
 import dev.snbv2.cloudcart.support.service.ContextManager;
-import dev.snbv2.cloudcart.support.service.GuardrailService;
 import dev.snbv2.cloudcart.support.service.RateLimitService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +16,13 @@ import java.util.Map;
  * REST controller that handles chat interactions with the agentic cart system.
  *
  * <p>Provides endpoints for sending chat messages and retrieving conversation history.
- * Incoming messages are validated through guardrails before being routed to the
- * appropriate domain-specific agent via the {@link RouterAgent}.
+ * Messages are routed to the appropriate domain-specific agent via the {@link RouterAgent}.
+ * Prompt guards (PII masking, off-topic rejection) are enforced by Agent Gateway.
  */
 @RestController
 public class ChatController {
 
     private final ContextManager contextManager;
-    private final GuardrailService guardrailService;
     private final RateLimitService rateLimitService;
     private final RouterAgent routerAgent;
 
@@ -33,14 +30,12 @@ public class ChatController {
      * Constructs a new {@code ChatController} with the required dependencies.
      *
      * @param contextManager   the manager responsible for creating and retrieving conversation contexts
-     * @param guardrailService the service that applies input guardrails to user messages
      * @param rateLimitService the service that enforces per-client request rate limits
      * @param routerAgent      the router agent that classifies intent and delegates to domain agents
      */
-    public ChatController(ContextManager contextManager, GuardrailService guardrailService,
+    public ChatController(ContextManager contextManager,
                            RateLimitService rateLimitService, RouterAgent routerAgent) {
         this.contextManager = contextManager;
-        this.guardrailService = guardrailService;
         this.rateLimitService = rateLimitService;
         this.routerAgent = routerAgent;
     }
@@ -54,10 +49,12 @@ public class ChatController {
      * <ol>
      *   <li>Creates a new conversation or loads an existing one based on the conversation ID</li>
      *   <li>Records the user's message as a conversation turn</li>
-     *   <li>Applies guardrail checks to the message and rejects disallowed content</li>
-     *   <li>Routes the sanitized message to the appropriate domain agent</li>
+     *   <li>Routes the message to the appropriate domain agent</li>
      *   <li>Records the agent's response and returns it to the caller</li>
      * </ol>
+     *
+     * <p>Prompt guards (PII masking, off-topic rejection) are enforced by Agent Gateway
+     * before the message reaches the LLM provider.
      *
      * @param request a map containing {@code "message"}, and optionally {@code "conversation_id"}
      *                and {@code "customer_id"}
@@ -93,21 +90,8 @@ public class ChatController {
                     .body(Map.of("error", "Rate limit exceeded. Please try again later."));
         }
 
-        // Apply guardrails
-        GuardrailResult guardrailResult = guardrailService.apply(message);
-        if (!guardrailResult.isAllowed()) {
-            String responseText = "I'm sorry, but I can't process that request. Please rephrase your message.";
-            contextManager.addTurn(ctx.getConversationId(), "assistant", responseText, "guardrails", null);
-            return ResponseEntity.ok(Map.of(
-                    "response", responseText,
-                    "conversation_id", ctx.getConversationId(),
-                    "agent", "guardrails",
-                    "tool_calls", List.of()
-            ));
-        }
-
-        // Route to agent
-        AgentResponse agentResponse = routerAgent.handle(ctx, guardrailResult.getSanitizedMessage());
+        // Route to agent (prompt guards are enforced by Agent Gateway)
+        AgentResponse agentResponse = routerAgent.handle(ctx, message);
 
         // Add assistant turn
         contextManager.addTurn(ctx.getConversationId(), "assistant",

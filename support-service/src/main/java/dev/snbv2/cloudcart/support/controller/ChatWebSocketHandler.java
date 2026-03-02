@@ -3,9 +3,7 @@ package dev.snbv2.cloudcart.support.controller;
 import dev.snbv2.cloudcart.support.agent.RouterAgent;
 import dev.snbv2.cloudcart.support.model.AgentResponse;
 import dev.snbv2.cloudcart.support.model.ConversationContext;
-import dev.snbv2.cloudcart.support.model.GuardrailResult;
 import dev.snbv2.cloudcart.support.service.ContextManager;
-import dev.snbv2.cloudcart.support.service.GuardrailService;
 import dev.snbv2.cloudcart.support.service.RateLimitService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.apachecommons.CommonsLog;
@@ -24,15 +22,14 @@ import java.util.Map;
  *
  * <p>This handler implements the same conversation flow as {@link ChatController} but over
  * a WebSocket connection, enabling bidirectional, low-latency messaging. It processes
- * incoming JSON messages, applies guardrails, routes to the appropriate agent, and sends
- * JSON responses back through the WebSocket session.
+ * incoming JSON messages, routes to the appropriate agent, and sends JSON responses back
+ * through the WebSocket session. Prompt guards are enforced by Agent Gateway.
  */
 @Component
 @CommonsLog
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private final ContextManager contextManager;
-    private final GuardrailService guardrailService;
     private final RateLimitService rateLimitService;
     private final RouterAgent routerAgent;
     private final ObjectMapper objectMapper;
@@ -41,16 +38,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      * Constructs a new {@code ChatWebSocketHandler} with the required dependencies.
      *
      * @param contextManager   the manager responsible for creating and retrieving conversation contexts
-     * @param guardrailService the service that applies input guardrails to user messages
      * @param rateLimitService the service that enforces per-client request rate limits
      * @param routerAgent      the router agent that classifies intent and delegates to domain agents
      * @param objectMapper     the Jackson object mapper for serializing and deserializing JSON messages
      */
-    public ChatWebSocketHandler(ContextManager contextManager, GuardrailService guardrailService,
+    public ChatWebSocketHandler(ContextManager contextManager,
                                  RateLimitService rateLimitService, RouterAgent routerAgent,
                                  ObjectMapper objectMapper) {
         this.contextManager = contextManager;
-        this.guardrailService = guardrailService;
         this.rateLimitService = rateLimitService;
         this.routerAgent = routerAgent;
         this.objectMapper = objectMapper;
@@ -77,10 +72,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
      *   <li>Validates that the message is present and non-blank</li>
      *   <li>Creates a new conversation or loads an existing one</li>
      *   <li>Records the user's message as a conversation turn</li>
-     *   <li>Applies guardrail checks and rejects disallowed content</li>
-     *   <li>Routes the sanitized message to the appropriate domain agent</li>
+     *   <li>Routes the message to the appropriate domain agent</li>
      *   <li>Sends the agent's JSON response back through the WebSocket session</li>
      * </ol>
+     *
+     * <p>Prompt guards (PII masking, off-topic rejection) are enforced by Agent Gateway.
      *
      * @param session     the WebSocket session from which the message was received
      * @param textMessage the incoming text message containing a JSON payload
@@ -122,22 +118,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             return;
         }
 
-        // Apply guardrails
-        GuardrailResult guardrailResult = guardrailService.apply(message);
-        if (!guardrailResult.isAllowed()) {
-            String responseText = "I'm sorry, but I can't process that request. Please rephrase your message.";
-            contextManager.addTurn(ctx.getConversationId(), "assistant", responseText, "guardrails", null);
-            sendJson(session, Map.of(
-                    "content", responseText,
-                    "conversation_id", ctx.getConversationId(),
-                    "agent", "guardrails",
-                    "tool_calls", List.of()
-            ));
-            return;
-        }
-
-        // Route to agent
-        AgentResponse agentResponse = routerAgent.handle(ctx, guardrailResult.getSanitizedMessage());
+        // Route to agent (prompt guards are enforced by Agent Gateway)
+        AgentResponse agentResponse = routerAgent.handle(ctx, message);
 
         // Add assistant turn
         contextManager.addTurn(ctx.getConversationId(), "assistant",
