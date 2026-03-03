@@ -1,6 +1,8 @@
 name: generate-architecture
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'docs/architecture.md'
 permissions:
