@@ -4,11 +4,6 @@ server:
 spring:
   application:
     name: orders-service
-  datasource:
-    url: jdbc:h2:mem:orders-service
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
   jpa:
     hibernate:
       ddl-auto: create

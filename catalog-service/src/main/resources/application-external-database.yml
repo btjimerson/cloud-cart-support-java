@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres.cloud-cart.svc:5432/catalog
+    driver-class-name: org.postgresql.Driver
+    username: catalog_user
+    password: ${CATALOG_DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

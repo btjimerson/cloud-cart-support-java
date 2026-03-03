@@ -25,7 +25,7 @@ Key features:
 - **Intent-based routing** -- A router agent classifies messages and hands off to specialist agents with full conversation context.
 - **Guardrails** -- Input screening detects and redacts PII (SSN, credit card, email, phone) and blocks off-topic content before it reaches any agent.
 - **MCP tool discovery** -- Agents call tools exposed by remote MCP server services, discovered automatically via the Spring AI MCP client.
-- **Microservice architecture** -- Each domain (catalog, orders, customers, notifications) runs as an independent Spring Boot service with its own database.
+- **Microservice architecture** -- Each domain (catalog, orders, customers, notifications) runs as an independent Spring Boot service with its own database (in-memory H2 by default, PostgreSQL via the `external-database` Spring profile).
 - **WebSocket support** -- Real-time chat interface via WebSocket in addition to REST endpoints.
 - **Conversation context** -- Full conversation history, handoff tracking, and metadata are maintained across agent transfers.
 

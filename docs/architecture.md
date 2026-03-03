@@ -23,10 +23,10 @@ graph TD
         customers["customers-service<br/><small>:8083</small>"]
         notifications["notifications-service<br/><small>:8084</small>"]
 
-        catalog --> catalog_db[("H2")]
-        orders --> orders_db[("H2")]
-        customers --> customers_db[("H2")]
-        notifications --> notifications_db[("H2")]
+        catalog --> catalog_db[("H2 / PostgreSQL")]
+        orders --> orders_db[("H2 / PostgreSQL")]
+        customers --> customers_db[("H2 / PostgreSQL")]
+        notifications --> notifications_db[("H2 / PostgreSQL")]
     end
 
     order_agent -->|MCP| orders
