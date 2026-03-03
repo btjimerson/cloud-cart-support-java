@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Requires AGENTGATEWAY_LICENSE_KEY env var (e.g. source .env)
+if [ -z "${AGENTGATEWAY_LICENSE_KEY:-}" ]; then
+  echo "ERROR: AGENTGATEWAY_LICENSE_KEY is not set. Source your .env file first."
+  exit 1
+fi
+
 echo "==> Installing Gateway API CRDs..."
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
 
@@ -12,6 +18,7 @@ helm upgrade -i enterprise-agentgateway-crds \
 echo "==> Installing Enterprise Agent Gateway control plane..."
 helm upgrade -i enterprise-agentgateway \
   oci://us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts/enterprise-agentgateway \
-  -n agentgateway-system --version 2.1.1
+  -n agentgateway-system --version 2.1.1 \
+  --set licensing.licenseKey="$AGENTGATEWAY_LICENSE_KEY"
 
 echo "==> Agent Gateway installation complete."
