@@ -10,7 +10,9 @@ A distributed multi-agent AI customer service system built with Spring Boot, Spr
 - [Prerequisites](#prerequisites)
 - [Install](#install)
 - [Usage](#usage)
+- [Kubernetes](#kubernetes)
 - [API](#api)
+- [Demo Script](#demo-script)
 - [Maintainers](#maintainers)
 - [License](#license)
 
@@ -120,6 +122,73 @@ curl -X POST http://localhost:8080/chat \
   -d '{"message": "Where is my order?", "customer_id": "C001"}'
 ```
 
+## Kubernetes
+
+The application runs on Kubernetes with [kgateway](https://kgateway.dev) as the ingress gateway. Container images are published to GHCR on tag push via GitHub Actions.
+
+### Cluster Setup
+
+Install Gateway API CRDs, kgateway, and Enterprise Agent Gateway:
+
+```sh
+# Install Gateway API CRDs
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
+
+# Install kgateway (ingress)
+helm upgrade -i kgateway-crds oci://ghcr.io/kgateway-dev/charts/kgateway-crds --namespace kgateway-system --create-namespace --version v2.2.0
+helm upgrade -i kgateway oci://ghcr.io/kgateway-dev/charts/kgateway --namespace kgateway-system --version v2.2.0
+
+# Install Enterprise Agent Gateway (source .env for license key first)
+k8s/agentgateway/install.sh
+```
+
+### Deploy the Application
+
+```sh
+# Build and push container images (requires a tag push to trigger GH Actions)
+git tag v0.1.0 && git push origin v0.1.0
+
+# Deploy namespace, secret, and all services
+k8s/deploy.sh
+
+# Access the UI
+kubectl port-forward svc/support-service -n cloud-cart 8080:8080
+```
+
+### Ingress Gateway
+
+A kgateway `Gateway` and `HTTPRoute` expose the support-service externally. An `HTTPListenerPolicy` enables WebSocket upgrades for the `/ws` endpoint.
+
+| Resource | Kind | Namespace | Purpose |
+|---|---|---|---|
+| `cloud-cart-gateway` | Gateway | kgateway-system | Listener on port 80, `gatewayClassName: kgateway` |
+| `support-service-route` | HTTPRoute | cloud-cart | Routes all traffic to `support-service:8080` |
+| `websocket-upgrade` | HTTPListenerPolicy | kgateway-system | Enables WebSocket upgrade on the gateway |
+
+```sh
+# Get the external IP
+kubectl get svc cloud-cart-gateway -n kgateway-system -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+
+### File Layout
+
+```
+k8s/
+├── namespace.yaml                  # cloud-cart namespace
+├── secret.yaml                     # Anthropic API key
+├── catalog-service.yaml            # Deployment + ClusterIP Service
+├── orders-service.yaml             # Deployment + ClusterIP Service
+├── customers-service.yaml          # Deployment + ClusterIP Service
+├── notifications-service.yaml      # Deployment + ClusterIP Service
+├── support-service.yaml            # Deployment + NodePort Service
+├── build-images.sh                 # Docker build + GHCR push
+├── deploy.sh                       # Full deployment orchestrator
+└── agentgateway/
+    └── install.sh                  # Helm install (Gateway API CRDs + Enterprise AG)
+```
+
+For the progressive Agent Gateway demo recipe, see [docs/recipe.md](docs/recipe.md).
+
 ## API
 
 ### `POST /chat`
@@ -157,6 +226,162 @@ Retrieve conversation history including turns, handoffs, and metadata.
 ### `GET /health`
 
 Health check endpoint.
+
+## Demo Script
+
+This section walks through the key features of Cloud Cart Support using concrete examples against the seeded data. Each section demonstrates a distinct capability of the multi-agent system.
+
+Start the application before running the demo (via Docker Compose, locally, or on Kubernetes). The app serves on port 8080. You can use the web UI in a browser or `curl` against the REST API.
+
+### 1. Intent-Based Routing
+
+The router agent classifies every incoming message and hands off to the right specialist.
+
+**Greeting (handled by router directly):**
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hi there!", "customer_id": "CUST-001"}' | jq .
+```
+
+**Order question (routed to order agent):**
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Where is my order ORD-2024-0003?", "customer_id": "CUST-003"}' | jq .
+```
+
+Note the `handoff` field in the response showing the transfer from `router` to `order` with the confidence score.
+
+### 2. Order Tracking and Management
+
+**Track a shipped order** (ORD-2024-0003, Emily Rodriguez, tracking `1Z999AA10123456786`):
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Can you track order ORD-2024-0003?", "customer_id": "CUST-003"}' | jq .
+```
+
+**Cancel a pending order** (ORD-2024-0005, Amanda Taylor, `pending` status):
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "I need to cancel order ORD-2024-0005", "customer_id": "CUST-005"}' | jq .
+```
+
+**Attempt to cancel a shipped order** (ORD-2024-0006, should be denied):
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Cancel order ORD-2024-0006 please", "customer_id": "CUST-006"}' | jq .
+```
+
+### 3. Product Search and Recommendations
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Do you have any wireless earbuds?", "customer_id": "CUST-001"}' | jq .
+```
+
+**Multi-term search:**
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "I am looking for a blender and a charger", "customer_id": "CUST-002"}' | jq .
+```
+
+### 4. Returns and Refunds
+
+The return policy: 30-day window, items in original condition, $5.99 return fee for non-defective items.
+
+**Initiate a return on a delivered order** (ORD-2024-0001, Sarah Johnson):
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "I want to return my order ORD-2024-0001, the headset does not fit well", "customer_id": "CUST-001"}' | jq .
+```
+
+### 5. Complaint Handling and Escalation
+
+**Standard complaint:**
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "I received a damaged product in my order and I am very disappointed", "customer_id": "CUST-004"}' | jq .
+```
+
+**Escalation trigger** (keywords: "lawyer", "manager", "unacceptable", etc.):
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "This is unacceptable! I want to speak to a manager immediately.", "customer_id": "CUST-004"}' | jq .
+```
+
+### 6. Guardrails -- PII Detection and Content Filtering
+
+**PII redaction** (SSN and credit card are redacted before reaching the agent):
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "My SSN is 123-45-6789 and my card is 4111 1111 1111 1111, can you check my order?", "customer_id": "CUST-001"}' | jq .
+```
+
+**Off-topic blocking:**
+
+```sh
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "How do I hack into someone account?", "customer_id": "CUST-001"}' | jq .
+```
+
+### 7. Multi-Turn Conversations
+
+```sh
+# Turn 1
+RESPONSE=$(curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What is the status of order ORD-2024-0008?", "customer_id": "CUST-008"}')
+echo "$RESPONSE" | jq .
+CONV_ID=$(echo "$RESPONSE" | jq -r '.conversation_id')
+
+# Turn 2 (same conversation)
+curl -s -X POST http://localhost:8080/chat \
+  -H "Content-Type: application/json" \
+  -d "{\"message\": \"Can you also tell me what products were in that order?\", \"conversation_id\": \"$CONV_ID\"}" | jq .
+```
+
+### Quick Reference: Seed Data
+
+**Order statuses:**
+
+| Status | Example Orders |
+|---|---|
+| delivered | ORD-2024-0001, ORD-2024-0002, ORD-2024-0004, ORD-2024-0010 |
+| shipped | ORD-2024-0003, ORD-2024-0006, ORD-2024-0008 |
+| pending | ORD-2024-0005, ORD-2024-0012, ORD-2024-0016 |
+| cancelled | ORD-2024-0009, ORD-2024-0018 |
+
+**Notable customers:**
+
+| Customer | Points | Tier |
+|---|---|---|
+| CUST-010 Thomas Brown | 5100 | Platinum |
+| CUST-004 James Wilson | 3200 | Gold |
+| CUST-001 Sarah Johnson | 2450 | Silver |
+| CUST-008 Robert Anderson | 450 | Bronze |
+
+**Product categories:** electronics, kitchen, sports, beauty, toys, home, pets, office, automotive, tools (50 products total)
 
 ## Maintainers
 
