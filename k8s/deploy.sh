@@ -24,13 +24,13 @@ fi
 
 # --- 4. Wait for rollouts ---
 echo "==> Waiting for deployments to become ready..."
-kubectl rollout status deployment/catalog-service -n cloud-cart --timeout=120s
-kubectl rollout status deployment/orders-service -n cloud-cart --timeout=120s
-kubectl rollout status deployment/customers-service -n cloud-cart --timeout=120s
-kubectl rollout status deployment/notifications-service -n cloud-cart --timeout=120s
-kubectl rollout status deployment/support-service -n cloud-cart --timeout=120s
+kubectl rollout status deployment/catalog-service -n cloud-cart-support --timeout=120s
+kubectl rollout status deployment/orders-service -n cloud-cart-support --timeout=120s
+kubectl rollout status deployment/customers-service -n cloud-cart-support --timeout=120s
+kubectl rollout status deployment/notifications-service -n cloud-cart-support --timeout=120s
+kubectl rollout status deployment/support-service -n cloud-cart-support --timeout=120s
 
 echo ""
 echo "==> Deployment complete!"
 echo "    Port-forward to access the UI:"
-echo "    kubectl port-forward svc/support-service -n cloud-cart 8080:8080"
+echo "    kubectl port-forward svc/support-service -n cloud-cart-support 8080:8080"

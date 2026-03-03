@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: catalog-service
-  namespace: cloud-cart
+  namespace: cloud-cart-support
   labels:
     app: catalog-service
 spec:
@@ -37,7 +37,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: catalog-service
-  namespace: cloud-cart
+  namespace: cloud-cart-support
 spec:
   selector:
     app: catalog-service
