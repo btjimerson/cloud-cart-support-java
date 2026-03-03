@@ -152,7 +152,7 @@ git tag v0.1.0 && git push origin v0.1.0
 k8s/deploy.sh
 
 # Access the UI
-kubectl port-forward svc/support-service -n cloud-cart 8080:8080
+kubectl port-forward svc/support-service -n cloud-cart-support 8080:8080
 ```
 
 ### Ingress Gateway
@@ -162,7 +162,7 @@ A kgateway `Gateway` and `HTTPRoute` expose the support-service externally. An `
 | Resource | Kind | Namespace | Purpose |
 |---|---|---|---|
 | `cloud-cart-gateway` | Gateway | kgateway-system | Listener on port 80, `gatewayClassName: kgateway` |
-| `support-service-route` | HTTPRoute | cloud-cart | Routes all traffic to `support-service:8080` |
+| `support-service-route` | HTTPRoute | cloud-cart-support | Routes `/support` to `support-service:8080` with URL rewrite |
 | `websocket-upgrade` | HTTPListenerPolicy | kgateway-system | Enables WebSocket upgrade on the gateway |
 
 ```sh
@@ -174,7 +174,7 @@ kubectl get svc cloud-cart-gateway -n kgateway-system -o jsonpath='{.status.load
 
 ```
 k8s/
-├── namespace.yaml                  # cloud-cart namespace
+├── namespace.yaml                  # cloud-cart-support namespace
 ├── secret.yaml                     # Anthropic API key
 ├── catalog-service.yaml            # Deployment + ClusterIP Service
 ├── orders-service.yaml             # Deployment + ClusterIP Service
