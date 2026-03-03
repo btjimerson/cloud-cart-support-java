@@ -28,8 +28,8 @@ const AGENT_COLORS = {
 // Initialize WebSocket connection
 function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const basePath = document.querySelector('script[src$="chat.js"]').src.replace(/\/js\/chat\.js.*$/, '');
-    const wsUrl = `${protocol}//${window.location.host}${new URL(basePath).pathname}/ws`;
+    const basePath = new URL(document.baseURI).pathname.replace(/\/$/, '');
+    const wsUrl = `${protocol}//${window.location.host}${basePath}/ws`;
 
     updateConnectionStatus('connecting');
 
