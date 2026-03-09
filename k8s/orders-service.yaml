@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: orders-service
-          image: ghcr.io/btjimerson/cloud-cart-support/orders-service:latest
+          image: ghcr.io/btjimerson/cloud-cart-support-java/orders-service:latest
           ports:
             - containerPort: 8080
           livenessProbe:

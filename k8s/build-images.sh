@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REGISTRY="ghcr.io/btjimerson/cloud-cart-support"
+REGISTRY="ghcr.io/btjimerson/cloud-cart-support-java"
 SERVICES=(catalog-service orders-service customers-service notifications-service support-service)
 
 cd "$(dirname "$0")/.."

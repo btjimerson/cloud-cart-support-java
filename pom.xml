@@ -12,10 +12,10 @@
     </parent>
 
     <groupId>dev.snbv2.cloudcart</groupId>
-    <artifactId>cloud-cart-support-parent</artifactId>
+    <artifactId>cloud-cart-support-java-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>cloud-cart-support</name>
+    <name>cloud-cart-support-java</name>
     <description>Multi-agent AI customer service system - Parent POM</description>
 
     <modules>

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: catalog-service
-          image: ghcr.io/btjimerson/cloud-cart-support/catalog-service:latest
+          image: ghcr.io/btjimerson/cloud-cart-support-java/catalog-service:latest
           ports:
             - containerPort: 8080
           livenessProbe:

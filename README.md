@@ -55,7 +55,7 @@ The system is composed of:
 This is a Maven multi-module monorepo:
 
 ```
-cloud-cart-support/
+cloud-cart-support-java/
 ├── pom.xml                    # Parent aggregator POM
 ├── docker-compose.yaml        # Run all services together
 ├── support-service/           # Orchestrator (agents, routing, frontend) - port 8080
@@ -80,7 +80,7 @@ Clone the repository and build all modules:
 
 ```sh
 git clone <repository-url>
-cd cloud-cart-support
+cd cloud-cart-support-java
 ./mvnw clean install
 ```
 
