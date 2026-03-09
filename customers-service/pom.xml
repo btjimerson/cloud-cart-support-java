@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>dev.snbv2.cloudcart</groupId>
-        <artifactId>cloud-cart-support-parent</artifactId>
+        <artifactId>cloud-cart-support-java-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
