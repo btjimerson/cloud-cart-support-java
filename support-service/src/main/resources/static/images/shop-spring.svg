@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Shopping Cart -->
+  <g id="cart">
+    <!-- Cart body -->
+    <path d="M 70 100 L 200 100 L 185 160 L 85 160 Z"
+          fill="#4a9fd8" stroke="#2d5f8d" stroke-width="4" stroke-linejoin="round"/>
+
+    <!-- Cart grid lines -->
+    <line x1="90" y1="100" x2="85" y2="160" stroke="#5eb3e8" stroke-width="3"/>
+    <line x1="110" y1="100" x2="105" y2="160" stroke="#5eb3e8" stroke-width="3"/>
+    <line x1="130" y1="100" x2="125" y2="160" stroke="#5eb3e8" stroke-width="3"/>
+    <line x1="150" y1="100" x2="145" y2="160" stroke="#5eb3e8" stroke-width="3"/>
+    <line x1="170" y1="100" x2="165" y2="160" stroke="#5eb3e8" stroke-width="3"/>
+
+    <!-- Cart handle -->
+    <path d="M 60 80 Q 65 90, 70 100"
+          fill="none" stroke="#2d5f8d" stroke-width="8" stroke-linecap="round"/>
+    <path d="M 60 80 Q 65 90, 70 100"
+          fill="none" stroke="#4a9fd8" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- Left wheel -->
+    <circle cx="100" cy="180" r="15" fill="#2d5f8d" stroke="#1a3a5a" stroke-width="3"/>
+    <circle cx="100" cy="180" r="8" fill="#ffffff"/>
+
+    <!-- Right wheel -->
+    <circle cx="170" cy="180" r="15" fill="#2d5f8d" stroke="#1a3a5a" stroke-width="3"/>
+    <circle cx="170" cy="180" r="8" fill="#ffffff"/>
+
+    <!-- Cart shadow -->
+    <ellipse cx="135" cy="195" rx="50" ry="8" fill="#000000" opacity="0.15"/>
+  </g>
+
+  <!-- Spring Leaf -->
+  <g id="spring-leaf">
+    <!-- Main leaf shape -->
+    <path d="M 165 60 Q 185 40, 210 45 Q 220 50, 218 60 Q 215 70, 205 75 Q 195 80, 180 78 Q 170 76, 165 70 Z"
+          fill="#6aab3e" stroke="#4d7e2d" stroke-width="3" stroke-linejoin="round"/>
+
+    <!-- Leaf vein -->
+    <path d="M 175 70 Q 185 60, 200 55"
+          fill="none" stroke="#4d7e2d" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Small leaf veins -->
+    <path d="M 180 72 L 185 68"
+          fill="none" stroke="#4d7e2d" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 190 70 L 195 65"
+          fill="none" stroke="#4d7e2d" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- Highlight on leaf -->
+    <ellipse cx="195" cy="62" rx="8" ry="5" fill="#8bc653" opacity="0.6"/>
+
+    <!-- Stem connecting to cart -->
+    <path d="M 165 70 Q 168 80, 172 90"
+          fill="none" stroke="#4d7e2d" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Accent glow behind leaf -->
+  <circle cx="192" cy="60" r="25" fill="#6aab3e" opacity="0.2"/>
+</svg>
