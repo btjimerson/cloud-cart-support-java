@@ -1,5 +1,6 @@
 FROM maven:3.9.10-eclipse-temurin-21 AS build
 COPY pom.xml /home/pom.xml
+RUN mvn -f /home/pom.xml install -N
 COPY orders-service/pom.xml /home/orders-service/pom.xml
 COPY orders-service/src /home/orders-service/src
 RUN mvn -f /home/orders-service/pom.xml clean package -DskipTests

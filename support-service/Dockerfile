@@ -1,5 +1,6 @@
 FROM maven:3.9.10-eclipse-temurin-21 AS build
 COPY pom.xml /home/pom.xml
+RUN mvn -f /home/pom.xml install -N
 COPY support-service/pom.xml /home/support-service/pom.xml
 COPY support-service/src /home/support-service/src
 RUN mvn -f /home/support-service/pom.xml clean package -DskipTests

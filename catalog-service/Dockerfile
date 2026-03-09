@@ -1,5 +1,6 @@
 FROM maven:3.9.10-eclipse-temurin-21 AS build
 COPY pom.xml /home/pom.xml
+RUN mvn -f /home/pom.xml install -N
 COPY catalog-service/pom.xml /home/catalog-service/pom.xml
 COPY catalog-service/src /home/catalog-service/src
 RUN mvn -f /home/catalog-service/pom.xml clean package -DskipTests

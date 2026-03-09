@@ -1,5 +1,6 @@
 FROM maven:3.9.10-eclipse-temurin-21 AS build
 COPY pom.xml /home/pom.xml
+RUN mvn -f /home/pom.xml install -N
 COPY notifications-service/pom.xml /home/notifications-service/pom.xml
 COPY notifications-service/src /home/notifications-service/src
 RUN mvn -f /home/notifications-service/pom.xml clean package -DskipTests
