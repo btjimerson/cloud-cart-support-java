@@ -15,6 +15,8 @@ spec:
       labels:
         app: catalog-service
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: catalog-service
           image: ghcr.io/btjimerson/cloud-cart-support-java/catalog-service:latest
