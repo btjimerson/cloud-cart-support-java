@@ -1,0 +1,19 @@
+apiVersion: agentgateway.solo.io/v1alpha1
+kind: EnterpriseAgentgatewayPolicy
+metadata:
+  name: observability-policy
+  namespace: agentgateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: anthropic-route
+  observability:
+    metrics:
+      enabled: true
+      prometheus:
+        enabled: true
+    tracing:
+      enabled: true
+      otlp:
+        endpoint: "http://otel-collector.observability.svc:4317"
