@@ -4,7 +4,6 @@ import dev.snbv2.cloudcart.support.agent.RouterAgent;
 import dev.snbv2.cloudcart.support.model.AgentResponse;
 import dev.snbv2.cloudcart.support.model.ConversationContext;
 import dev.snbv2.cloudcart.support.service.ContextManager;
-import dev.snbv2.cloudcart.support.service.RateLimitService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Component;
@@ -23,30 +22,27 @@ import java.util.Map;
  * <p>This handler implements the same conversation flow as {@link ChatController} but over
  * a WebSocket connection, enabling bidirectional, low-latency messaging. It processes
  * incoming JSON messages, routes to the appropriate agent, and sends JSON responses back
- * through the WebSocket session. Prompt guards are enforced by Agent Gateway.
+ * through the WebSocket session. Prompt guards and rate limiting are enforced by
+ * Enterprise Agent Gateway.
  */
 @Component
 @CommonsLog
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private final ContextManager contextManager;
-    private final RateLimitService rateLimitService;
     private final RouterAgent routerAgent;
     private final ObjectMapper objectMapper;
 
     /**
      * Constructs a new {@code ChatWebSocketHandler} with the required dependencies.
      *
-     * @param contextManager   the manager responsible for creating and retrieving conversation contexts
-     * @param rateLimitService the service that enforces per-client request rate limits
-     * @param routerAgent      the router agent that classifies intent and delegates to domain agents
-     * @param objectMapper     the Jackson object mapper for serializing and deserializing JSON messages
+     * @param contextManager the manager responsible for creating and retrieving conversation contexts
+     * @param routerAgent    the router agent that classifies intent and delegates to domain agents
+     * @param objectMapper   the Jackson object mapper for serializing and deserializing JSON messages
      */
-    public ChatWebSocketHandler(ContextManager contextManager,
-                                 RateLimitService rateLimitService, RouterAgent routerAgent,
+    public ChatWebSocketHandler(ContextManager contextManager, RouterAgent routerAgent,
                                  ObjectMapper objectMapper) {
         this.contextManager = contextManager;
-        this.rateLimitService = rateLimitService;
         this.routerAgent = routerAgent;
         this.objectMapper = objectMapper;
     }
@@ -110,15 +106,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         // Add user turn
         contextManager.addTurn(ctx.getConversationId(), "user", message, "", null);
 
-        // Enforce rate limit
-        String rateLimitKey = (customerId instanceof String && !((String) customerId).isBlank())
-                ? (String) customerId : ctx.getConversationId();
-        if (!rateLimitService.tryAcquire(rateLimitKey)) {
-            sendJson(session, Map.of("error", "Rate limit exceeded. Please try again later."));
-            return;
-        }
-
-        // Route to agent (prompt guards are enforced by Agent Gateway)
+        // Route to agent (prompt guards and rate limiting are enforced by Enterprise Agent Gateway)
         AgentResponse agentResponse = routerAgent.handle(ctx, message);
 
         // Add assistant turn

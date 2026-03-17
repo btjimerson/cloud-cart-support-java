@@ -4,7 +4,6 @@ import dev.snbv2.cloudcart.support.agent.RouterAgent;
 import dev.snbv2.cloudcart.support.model.AgentResponse;
 import dev.snbv2.cloudcart.support.model.ConversationContext;
 import dev.snbv2.cloudcart.support.service.ContextManager;
-import dev.snbv2.cloudcart.support.service.RateLimitService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,26 +16,23 @@ import java.util.Map;
  *
  * <p>Provides endpoints for sending chat messages and retrieving conversation history.
  * Messages are routed to the appropriate domain-specific agent via the {@link RouterAgent}.
- * Prompt guards (PII masking, off-topic rejection) are enforced by Agent Gateway.
+ * Prompt guards (PII masking, off-topic rejection) and rate limiting are enforced by
+ * Enterprise Agent Gateway.
  */
 @RestController
 public class ChatController {
 
     private final ContextManager contextManager;
-    private final RateLimitService rateLimitService;
     private final RouterAgent routerAgent;
 
     /**
      * Constructs a new {@code ChatController} with the required dependencies.
      *
-     * @param contextManager   the manager responsible for creating and retrieving conversation contexts
-     * @param rateLimitService the service that enforces per-client request rate limits
-     * @param routerAgent      the router agent that classifies intent and delegates to domain agents
+     * @param contextManager the manager responsible for creating and retrieving conversation contexts
+     * @param routerAgent    the router agent that classifies intent and delegates to domain agents
      */
-    public ChatController(ContextManager contextManager,
-                           RateLimitService rateLimitService, RouterAgent routerAgent) {
+    public ChatController(ContextManager contextManager, RouterAgent routerAgent) {
         this.contextManager = contextManager;
-        this.rateLimitService = rateLimitService;
         this.routerAgent = routerAgent;
     }
 
@@ -83,14 +79,7 @@ public class ChatController {
         // Add user turn
         contextManager.addTurn(ctx.getConversationId(), "user", message, "", null);
 
-        // Enforce rate limit
-        String rateLimitKey = customerId.isBlank() ? ctx.getConversationId() : customerId;
-        if (!rateLimitService.tryAcquire(rateLimitKey)) {
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body(Map.of("error", "Rate limit exceeded. Please try again later."));
-        }
-
-        // Route to agent (prompt guards are enforced by Agent Gateway)
+        // Route to agent (prompt guards and rate limiting are enforced by Enterprise Agent Gateway)
         AgentResponse agentResponse = routerAgent.handle(ctx, message);
 
         // Add assistant turn
