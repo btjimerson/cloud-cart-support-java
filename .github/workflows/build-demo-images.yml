@@ -1,0 +1,43 @@
+name: Build Demo Step Images
+
+on:
+  push:
+    branches:
+      - 'demo/**'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
+jobs:
+  build-support-service:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract step tag from branch name
+        id: step
+        run: |
+          # demo/step-1-api-keys -> step-1-api-keys
+          step_tag="${GITHUB_REF#refs/heads/demo/}"
+          echo "tag=$step_tag" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push support-service
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: support-service/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/support-service:${{ steps.step.outputs.tag }}
