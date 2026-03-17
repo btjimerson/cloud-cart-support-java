@@ -24,7 +24,7 @@ spec:
             - containerPort: 8080
           env:
             - name: SPRING_AI_ANTHROPIC_BASE_URL
-              value: "http://enterprise-agentgateway-proxy.agentgateway-system.svc:8080"
+              value: "http://enterprise-agentgateway.agentgateway-system.svc:8080"
             - name: CATALOG_SERVICE_URL
               value: "http://catalog-service.cloud-cart-support.svc:8080"
             - name: ORDERS_SERVICE_URL

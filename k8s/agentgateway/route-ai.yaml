@@ -8,6 +8,6 @@ spec:
     - name: enterprise-agentgateway
   rules:
     - backendRefs:
-        - group: agentgateway.solo.io
+        - group: agentgateway.dev
           kind: AgentgatewayBackend
           name: anthropic
