@@ -1,0 +1,13 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: anthropic-route
+  namespace: agentgateway-system
+spec:
+  parentRefs:
+    - name: enterprise-agentgateway
+  rules:
+    - backendRefs:
+        - group: agentgateway.solo.io
+          kind: AgentgatewayBackend
+          name: anthropic
