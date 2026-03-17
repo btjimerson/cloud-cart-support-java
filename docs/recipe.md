@@ -5,7 +5,7 @@
 This repo serves two goals:
 
 1. **Agentic vs microservices comparison** -- show how agentic app patterns (agents, orchestrator, guardrails) map to traditional microservice patterns (controllers, service mesh, middleware). See `../cloud-cart` for the microservices equivalent.
-2. **Platform replacement walkthrough** -- demonstrate how in-app "plumbing" code can be replaced by Solo.io's Agent Gateway as a platform component in higher environments (staging, production, Kubernetes).
+2. **Platform replacement walkthrough** -- demonstrate how in-app "plumbing" code can be replaced by Solo.io's Enterprise Agent Gateway as a Kubernetes-native platform component, configured declaratively via CRDs.
 
 ## Demo Structure
 
@@ -17,8 +17,8 @@ The demo steps are organized as a stacked branch chain. Each branch builds on th
 
 ```
 main (step 0 -- baseline)
- └── demo/step-1-prompt-guards
-      └── demo/step-2-api-keys
+ └── demo/step-1-api-keys
+      └── demo/step-2-prompt-guards
            └── demo/step-3-model-config
                 └── demo/step-4-rate-limiting
                      └── demo/step-5-observability
@@ -27,9 +27,9 @@ main (step 0 -- baseline)
 When `main` changes, rebase the chain forward:
 
 ```bash
-git rebase main demo/step-1-prompt-guards
-git rebase demo/step-1-prompt-guards demo/step-2-api-keys
-git rebase demo/step-2-api-keys demo/step-3-model-config
+git rebase main demo/step-1-api-keys
+git rebase demo/step-1-api-keys demo/step-2-prompt-guards
+git rebase demo/step-2-prompt-guards demo/step-3-model-config
 git rebase demo/step-3-model-config demo/step-4-rate-limiting
 git rebase demo/step-4-rate-limiting demo/step-5-observability
 ```
@@ -38,9 +38,9 @@ git rebase demo/step-4-rate-limiting demo/step-5-observability
 
 ```bash
 git tag demo/step-0-baseline main
-git tag demo/step-1-prompt-guards demo/step-1-prompt-guards
+git tag demo/step-1-api-keys demo/step-1-api-keys
 # ... etc
-git branch -d demo/step-1-prompt-guards demo/step-2-api-keys ...
+git branch -d demo/step-1-api-keys demo/step-2-prompt-guards ...
 ```
 
 Tags are immutable snapshots -- the right format for a finished demo, but the wrong format for a codebase that's still changing.
@@ -49,10 +49,10 @@ Tags are immutable snapshots -- the right format for a finished demo, but the wr
 
 ```bash
 # Jump to any step (works with both branches and tags)
-git checkout demo/step-2-api-keys
+git checkout demo/step-1-api-keys
 
 # See what a step changed relative to the previous step
-git diff demo/step-1-prompt-guards..demo/step-2-api-keys
+git diff main..demo/step-1-api-keys
 
 # Reset to the baseline
 git checkout main
@@ -77,15 +77,31 @@ Key talking points:
 - ConversationContext = session management
 - HandoffManager = service-to-service orchestration
 
-### Step 1: Prompt Guards
+### Step 1: API Key Management
 
-**Branch:** `demo/step-1-prompt-guards` (from `main`)
+**Branch:** `demo/step-1-api-keys` (from `main`)
 
-Replace `GuardrailService` (in-app regex-based PII detection and content filtering) with Agent Gateway's prompt guards.
+Move LLM API key management from the application to Enterprise Agent Gateway's backend auth.
+
+**What changes:**
+- Application no longer needs `ANTHROPIC_API_KEY` at all
+- App points to Enterprise Agent Gateway instead of directly to Anthropic
+- Gateway injects the API key via `backendAuth` policy
+
+**Why this matters:**
+- Applications never see or store LLM credentials
+- Key rotation is a gateway config change, not an app redeploy
+- Centralized credential management across all apps
+
+### Step 2: Prompt Guards
+
+**Branch:** `demo/step-2-prompt-guards` (from step 1)
+
+Replace `GuardrailService` (in-app regex-based PII detection and content filtering) with Enterprise Agent Gateway's prompt guards.
 
 **What changes:**
 - Remove or bypass `GuardrailService`
-- Configure Agent Gateway with `promptGuard` policy (reject + mask rules)
+- Configure Enterprise Agent Gateway with `promptGuard` policy (reject + mask rules)
 - Built-in PII detectors (credit card, SSN, email, phone) replace hand-rolled regex
 - Off-topic blocking moves to gateway-level reject rules
 
@@ -94,31 +110,15 @@ Replace `GuardrailService` (in-app regex-based PII detection and content filteri
 - Consistent enforcement across all apps behind the gateway
 - New patterns (e.g., Canadian SIN) added via config, not code deploys
 
-### Step 2: API Key Management
-
-**Branch:** `demo/step-2-api-keys` (from step 1)
-
-Move LLM API key management from the application to Agent Gateway's backend auth.
-
-**What changes:**
-- Application no longer needs `ANTHROPIC_API_KEY` at all
-- App points to Agent Gateway at `localhost:3000` instead of directly to Anthropic
-- Gateway injects the API key via `backendAuth` policy
-
-**Why this matters:**
-- Applications never see or store LLM credentials
-- Key rotation is a gateway config change, not an app redeploy
-- Centralized credential management across all apps
-
 ### Step 3: Model Configuration
 
 **Branch:** `demo/step-3-model-config` (from step 2)
 
-Move model selection, token limits, and temperature settings from application code/config to Agent Gateway.
+Move model selection, token limits, and temperature settings from application code/config to Enterprise Agent Gateway.
 
 **What changes:**
 - Remove model name and `maxTokens` from `AnthropicChatOptions` in code
-- Configure `defaults` and `overrides` in Agent Gateway (model, max_tokens, temperature)
+- Configure `defaults` and `overrides` in Enterprise Agent Gateway (model, max_tokens, temperature)
 - Optionally set up model aliases (`fast` -> `claude-haiku`, `smart` -> `claude-sonnet`)
 
 **Why this matters:**
@@ -130,7 +130,7 @@ Move model selection, token limits, and temperature settings from application co
 
 **Branch:** `demo/step-4-rate-limiting` (from step 3)
 
-Add token-based and request-based rate limiting via Agent Gateway.
+Add token-based and request-based rate limiting via Enterprise Agent Gateway.
 
 **What changes:**
 - No code in the app -- purely additive gateway configuration
@@ -146,7 +146,7 @@ Add token-based and request-based rate limiting via Agent Gateway.
 
 **Branch:** `demo/step-5-observability` (from step 4)
 
-Add LLM-aware observability via Agent Gateway's built-in OpenTelemetry support.
+Add LLM-aware observability via Enterprise Agent Gateway's built-in OpenTelemetry support.
 
 **What changes:**
 - No code in the app -- purely additive gateway configuration
@@ -165,8 +165,8 @@ Add LLM-aware observability via Agent Gateway's built-in OpenTelemetry support.
 # demo.sh -- jump to a demo step
 STEPS=(
   "main"
-  "demo/step-1-prompt-guards"
-  "demo/step-2-api-keys"
+  "demo/step-1-api-keys"
+  "demo/step-2-prompt-guards"
   "demo/step-3-model-config"
   "demo/step-4-rate-limiting"
   "demo/step-5-observability"
@@ -182,26 +182,6 @@ echo "Switching to: ${STEPS[$step]}"
 git checkout "${STEPS[$step]}"
 ```
 
-## Agent Gateway Configuration (OSS Standalone)
+## Enterprise Agent Gateway Configuration
 
-The demo uses the OSS standalone binary for local runs. Example base config:
-
-```yaml
-# agentgateway.yaml
-# yaml-language-server: $schema=https://agentgateway.dev/schema/config
-binds:
-- port: 3000
-  listeners:
-  - routes:
-    - backends:
-      - ai:
-          name: anthropic
-          provider:
-            anthropic:
-              model: claude-sonnet-4-5-20250929
-      policies:
-        backendAuth:
-          key: "$ANTHROPIC_API_KEY"
-```
-
-This config evolves with each step as policies are added.
+The demo uses Solo.io's Enterprise Agent Gateway deployed on Kubernetes via Helm. Gateway behavior is configured declaratively using CRDs (`HTTPRoute`, `EnterpriseAgentgatewayPolicy`, etc.). See `k8s/agentgateway/install.sh` for cluster setup and individual step branches for the CRD manifests added at each step.
