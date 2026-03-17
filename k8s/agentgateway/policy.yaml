@@ -1,4 +1,4 @@
-apiVersion: enterpriseagentgateway.solo.io/v1alpha1
+apiVersion: agentgateway.solo.io/v1alpha1
 kind: EnterpriseAgentgatewayPolicy
 metadata:
   name: prompt-guard-policy
@@ -8,37 +8,15 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: anthropic-route
-  backend:
-    ai:
-      # Routes must be in the same policy as promptGuard to avoid silent
-      # policy conflict (see agentgateway-enterprise#149, #267)
-      routes:
-        "/v1/chat/completions": Completions
-        "/v1/messages": Messages
-        "/v1/models": Models
-        "*": Passthrough
-      promptGuard:
-        request:
-          # Reject harmful content
-          - regex:
-              action: Reject
-              matches:
-                - "(?i)(violence|weapon|drug|illegal|hack|exploit|kill|harm|steal|fraud|scam|phishing|porn|abuse|threat)"
-            response:
-              message: "Your message was blocked because it contains inappropriate content."
-              statusCode: 403
-          # Reject PII (SSN, phone numbers, emails)
-          - regex:
-              action: Reject
-              builtins:
-                - Ssn
-                - PhoneNumber
-                - Email
-            response:
-              message: "Your message was blocked because it contains personally identifiable information."
-              statusCode: 422
-          # Mask credit card numbers (replace with <CREDIT_CARD> in transit)
-          - regex:
-              action: Mask
-              builtins:
-                - CreditCard
+  promptGuard:
+    request:
+      customResponseMessage: "Your message was blocked because it contains inappropriate content."
+      reject:
+        - pattern: "(?i)(violence|weapon|drug|illegal|hack|exploit|kill|harm|steal|fraud|scam|phishing|porn|abuse|threat)"
+          action: REJECT
+      mask:
+        builtins:
+          - CREDIT_CARD
+          - SSN
+          - EMAIL
+          - PHONE_NUMBER
