@@ -1,13 +1,14 @@
-apiVersion: agentgateway.dev/v1alpha1
+apiVersion: agentgateway.solo.io/v1alpha1
 kind: AgentgatewayBackend
 metadata:
   name: anthropic
   namespace: agentgateway-system
 spec:
-  ai:
-    provider:
-      anthropic: {}
-  policies:
-    auth:
-      secretRef:
-        name: anthropic-api-key
+  type: anthropic
+  provider:
+    anthropic:
+      url: https://api.anthropic.com
+      authToken:
+        secretRef:
+          name: anthropic-api-key
+          key: Authorization
