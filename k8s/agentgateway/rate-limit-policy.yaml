@@ -1,4 +1,4 @@
-apiVersion: enterpriseagentgateway.solo.io/v1alpha1
+apiVersion: agentgateway.solo.io/v1alpha1
 kind: EnterpriseAgentgatewayPolicy
 metadata:
   name: rate-limit-policy
@@ -11,6 +11,8 @@ spec:
   traffic:
     rateLimit:
       local:
-        - requests: 3
-          unit: Minutes
-          burst: 2
+        requests: 20
+        unit: MINUTE
+      tokenBudget:
+        maxTokens: 50000
+        unit: HOUR
