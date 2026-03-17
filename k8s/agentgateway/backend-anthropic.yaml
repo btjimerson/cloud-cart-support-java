@@ -1,4 +1,4 @@
-apiVersion: agentgateway.solo.io/v1alpha1
+apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayBackend
 metadata:
   name: anthropic
