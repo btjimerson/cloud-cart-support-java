@@ -6,7 +6,14 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # --- 1. Create namespace and secret ---
 echo "==> Creating namespace and secret..."
 kubectl apply -f "${SCRIPT_DIR}/namespace.yaml"
-kubectl apply -f "${SCRIPT_DIR}/secret.yaml"
+if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+  kubectl create secret generic anthropic-api-key \
+    -n cloud-cart-support \
+    --from-literal=ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY}" \
+    --dry-run=client -o yaml | kubectl apply -f -
+else
+  kubectl apply -f "${SCRIPT_DIR}/secret.yaml"
+fi
 
 # --- 2. Deploy application services ---
 echo "==> Deploying application services..."
