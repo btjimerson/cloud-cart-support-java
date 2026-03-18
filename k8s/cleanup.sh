@@ -13,7 +13,7 @@ kubectl delete agentgatewaybackend --all -n agentgateway-system --ignore-not-fou
 kubectl delete agentgatewaypolicy --all -n agentgateway-system --ignore-not-found 2>/dev/null || true
 kubectl delete enterpriseagentgatewaypolicy --all -n agentgateway-system --ignore-not-found 2>/dev/null || true
 kubectl delete httproute --all -n agentgateway-system --ignore-not-found 2>/dev/null || true
-kubectl delete gateway enterprise-agentgateway -n agentgateway-system --ignore-not-found 2>/dev/null || true
+kubectl delete gateway agentgateway -n agentgateway-system --ignore-not-found 2>/dev/null || true
 kubectl delete secret anthropic-api-key -n agentgateway-system --ignore-not-found 2>/dev/null || true
 
 echo "==> Uninstalling Enterprise Agent Gateway..."
