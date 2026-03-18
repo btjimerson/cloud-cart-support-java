@@ -11,8 +11,6 @@ spec:
   traffic:
     rateLimit:
       local:
-        requests: 20
-        unit: MINUTE
-      tokenBudget:
-        maxTokens: 50000
-        unit: HOUR
+        - requests: 20
+          unit: Minutes
+          burst: 5
