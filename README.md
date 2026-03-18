@@ -195,6 +195,11 @@ k8s/
 ├── support-service.yaml            # Deployment + NodePort Service
 ├── build-images.sh                 # Docker build + GHCR push
 ├── deploy.sh                       # Full deployment orchestrator
+├── kgateway/
+│   ├── gateway.yaml                # Gateway (cloud-cart-gateway, port 80)
+│   ├── httproute.yaml              # HTTPRoute (/support → support-service:8080)
+│   ├── httplistenerpolicy.yaml     # HTTPListenerPolicy (WebSocket upgrade)
+│   └── apply.sh                    # Apply all kgateway resources
 └── agentgateway/
     └── install.sh                  # Helm install (Gateway API CRDs + Enterprise AG)
 ```
