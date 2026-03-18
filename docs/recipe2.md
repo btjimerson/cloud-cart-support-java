@@ -71,7 +71,7 @@ helm upgrade -i enterprise-kgateway \
 helm template enterprise-agentgateway-crds \
   oci://us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts/enterprise-agentgateway-crds \
   --version "${ENTERPRISE_AGENTGATEWAY_VERSION}" \
-  | kubectl apply --server-side --force-conflicts -f -
+  | kubectl apply --server-side --force-conflicts --validate=false -f -
 
 # Control plane
 kubectl create namespace agentgateway-system --dry-run=client -o yaml | kubectl apply -f -
@@ -79,7 +79,7 @@ helm upgrade -i enterprise-agentgateway \
   oci://us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts/enterprise-agentgateway \
   --namespace agentgateway-system --create-namespace \
   --version "${ENTERPRISE_AGENTGATEWAY_VERSION}" \
-  --set licensing.licenseKey="${ENTERPRISE_AGENTGATEWAY_LICENSE_KEY}"
+  --set-string licensing.licenseKey="${ENTERPRISE_AGENTGATEWAY_LICENSE_KEY}"
 ```
 
 ### 5. Verify infrastructure
@@ -99,9 +99,10 @@ All pods should be `Running` and both `enterprise-kgateway` and `enterprise-agen
 
 ### 6. Apply kgateway ingress resources
 
+> **Note:** The HTTPRoute is in the `cloud-cart-support` namespace. Apply the Gateway and policy first, then apply the HTTPRoute after deploying the application (Step 0) which creates the namespace.
+
 ```bash
 kubectl apply -f k8s/kgateway/gateway.yaml
-kubectl apply -f k8s/kgateway/httproute.yaml
 kubectl apply -f k8s/kgateway/httplistenerpolicy.yaml
 ```
 
@@ -178,8 +179,18 @@ A working baseline to demonstrate the application and compare against gateway-ma
 ```bash
 git checkout main
 
+# Create the API key secret with the real key from .env
+kubectl create namespace cloud-cart-support --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic anthropic-api-key \
+  -n cloud-cart-support \
+  --from-literal=ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY}" \
+  --dry-run=client -o yaml | kubectl apply -f -
+
 # Deploy all services
 k8s/deploy.sh
+
+# Apply the kgateway HTTPRoute (namespace now exists)
+kubectl apply -f k8s/kgateway/httproute.yaml
 ```
 
 ### Verify
@@ -244,7 +255,7 @@ BEFORE:                                AFTER:
 
 **Code changed:**
 - `application.yml` — `base-url` points to gateway; `api-key: not-used`
-- `support-service.yaml` — env var `SPRING_AI_ANTHROPIC_BASE_URL` points to `enterprise-agentgateway.agentgateway-system.svc:8080`
+- `support-service.yaml` — env var `SPRING_AI_ANTHROPIC_BASE_URL` points to `agentgateway.agentgateway-system.svc:8080`
 
 **CRDs added:**
 - `k8s/agentgateway/backend-anthropic.yaml` — AgentgatewayBackend with `backendAuth` referencing the API key Secret
@@ -252,7 +263,7 @@ BEFORE:                                AFTER:
 - `k8s/agentgateway/route-ai.yaml` — HTTPRoute routing LLM traffic to the Anthropic backend
 
 **Secret moved:**
-- `k8s/secret.yaml` — now in `agentgateway-system` namespace with `Authorization: Bearer <key>` format
+- `k8s/secret.yaml` — now in `agentgateway-system` namespace with `Authorization: <key>` format (the gateway translates this to `x-api-key` for Anthropic)
 
 ### Deploy
 
@@ -262,7 +273,7 @@ git checkout demo/step-1-api-keys
 # Create the API key secret in agentgateway-system
 kubectl create secret generic anthropic-api-key \
   -n agentgateway-system \
-  --from-literal=Authorization="Bearer ${ANTHROPIC_API_KEY}" \
+  --from-literal=Authorization="${ANTHROPIC_API_KEY}" \
   --dry-run=client -o yaml | kubectl apply -f -
 
 # Deploy application + Agent Gateway CRDs
@@ -278,8 +289,8 @@ kubectl get agentgatewaybackend -n agentgateway-system
 # HTTPRoute bound
 kubectl get httproute -n agentgateway-system
 
-# Enterprise Agent Gateway has an address
-kubectl get gateway enterprise-agentgateway -n agentgateway-system
+# Agent Gateway has an address
+kubectl get gateway agentgateway -n agentgateway-system
 
 # Chat still works (traffic now flows through gateway)
 curl -s -X POST http://${GATEWAY_IP}/chat \
@@ -643,7 +654,7 @@ kubectl delete agentgatewaybackend --all -n agentgateway-system --ignore-not-fou
 kubectl delete agentgatewaypolicy --all -n agentgateway-system --ignore-not-found
 kubectl delete enterpriseagentgatewaypolicy --all -n agentgateway-system --ignore-not-found
 kubectl delete httproute --all -n agentgateway-system --ignore-not-found
-kubectl delete gateway enterprise-agentgateway -n agentgateway-system --ignore-not-found
+kubectl delete gateway agentgateway -n agentgateway-system --ignore-not-found
 kubectl delete secret anthropic-api-key -n agentgateway-system --ignore-not-found
 
 # Uninstall Enterprise Agent Gateway
@@ -736,12 +747,29 @@ Container images are public on GHCR (`ghcr.io/btjimerson/cloud-cart-support-java
 kubectl describe pod -n cloud-cart-support <pod-name> | grep -A2 "Image:"
 ```
 
-### Enterprise Agent Gateway controller crash (automountServiceAccountToken)
+### Enterprise Agent Gateway controller Unauthorized / no proxy pod
 
-If the enterprise-agentgateway controller crashes with no logs, check the ServiceAccount:
+If the controller logs show `watch error: Unauthorized` or the Gateway proxy pod never appears, the ServiceAccount may be missing. Recreate it:
 
 ```bash
-kubectl get sa enterprise-agentgateway -n agentgateway-system -o jsonpath='{.automountServiceAccountToken}'
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: enterprise-agentgateway
+  namespace: agentgateway-system
+automountServiceAccountToken: true
+EOF
+
+kubectl rollout restart deploy/enterprise-agentgateway -n agentgateway-system
 ```
 
-If it shows `false`, the controller's own reconciliation loop is overwriting the SA. Fix by adding `automountServiceAccountToken: true` at the pod spec level in the Deployment.
+### Gateway name conflict with controller Deployment
+
+The Gateway resource **must not** be named `enterprise-agentgateway` — that name is used by the Helm-installed controller Deployment. The controller tries to create a proxy Deployment with the same name as the Gateway, and Kubernetes rejects it because label selectors are immutable. Use `agentgateway` as the Gateway name instead.
+
+### Content blocks format (Spring AI)
+
+The Agent Gateway proxy (v2.1.x) does not support Anthropic's content blocks format (`"content": [{"type":"text","text":"..."}]`). Spring AI's Anthropic client uses this format, which causes 400 errors from the gateway. Workarounds:
+- Use plain string `content` fields in direct API calls
+- Switch the app to use Spring AI's OpenAI adapter (the gateway presents an OpenAI-compatible API)
