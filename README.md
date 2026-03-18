@@ -213,7 +213,8 @@ k8s/
     ├── gateway.yaml                # Enterprise Agent Gateway listener
     ├── backend-anthropic.yaml      # AgentgatewayBackend for Anthropic
     ├── route-ai.yaml               # HTTPRoute for AI traffic
-    └── policy.yaml                 # EnterpriseAgentgatewayPolicy (prompt guards, PII masking)
+    ├── policy.yaml                 # EnterpriseAgentgatewayPolicy (prompt guards, PII masking)
+    └── model-policy.yaml           # AgentgatewayPolicy (model defaults and overrides)
 ```
 
 For the progressive Agent Gateway demo recipe, see [docs/recipe.md](docs/recipe.md).
