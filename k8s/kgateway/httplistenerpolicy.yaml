@@ -1,0 +1,14 @@
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: HttpListenerPolicy
+metadata:
+  name: websocket-upgrade
+  namespace: kgateway-system
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: cloud-cart-gateway
+  options:
+    httpConnectionManager:
+      upgradeConfigs:
+        - upgradeType: websocket

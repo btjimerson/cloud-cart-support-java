@@ -1,0 +1,23 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: support-service-route
+  namespace: cloud-cart-support
+spec:
+  parentRefs:
+    - name: cloud-cart-gateway
+      namespace: kgateway-system
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /support
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: support-service
+          port: 8080
