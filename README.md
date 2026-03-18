@@ -173,8 +173,8 @@ k8s/kgateway/apply.sh
 
 | Resource | Kind | Namespace | Purpose |
 |---|---|---|---|
-| `cloud-cart-gateway` | Gateway | kgateway-system | Listener on port 80, `gatewayClassName: kgateway` |
-| `support-service-route` | HTTPRoute | cloud-cart-support | Routes `/support` to `support-service:8080` with URL rewrite |
+| `cloud-cart-gateway` | Gateway | kgateway-system | Listener on port 80, `gatewayClassName: kgateway`, routes from all namespaces |
+| `support-service-route` | HTTPRoute | cloud-cart-support | Routes `/` to `support-service:8080` |
 | `websocket-upgrade` | HTTPListenerPolicy | kgateway-system | Enables WebSocket upgrade on the gateway |
 
 ```sh

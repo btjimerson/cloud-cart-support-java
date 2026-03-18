@@ -11,13 +11,7 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /support
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /
+            value: /
       backendRefs:
         - name: support-service
           port: 8080
