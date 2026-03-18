@@ -8,15 +8,21 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: anthropic-route
-  promptGuard:
-    request:
-      customResponseMessage: "Your message was blocked because it contains inappropriate content."
-      reject:
-        - pattern: "(?i)(violence|weapon|drug|illegal|hack|exploit|kill|harm|steal|fraud|scam|phishing|porn|abuse|threat)"
-          action: REJECT
-      mask:
-        builtins:
-          - CREDIT_CARD
-          - SSN
-          - EMAIL
-          - PHONE_NUMBER
+  backend:
+    ai:
+      promptGuard:
+        request:
+          - regex:
+              action: Reject
+              matches:
+                - "(?i)(violence|weapon|drug|illegal|hack|exploit|kill|harm|steal|fraud|scam|phishing|porn|abuse|threat)"
+            response:
+              message: "Your message was blocked because it contains inappropriate content."
+              statusCode: 403
+          - regex:
+              action: Mask
+              builtins:
+                - CreditCard
+                - Ssn
+                - Email
+                - PhoneNumber
