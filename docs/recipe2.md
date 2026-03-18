@@ -73,13 +73,18 @@ helm template enterprise-agentgateway-crds \
   --version "${ENTERPRISE_AGENTGATEWAY_VERSION}" \
   | kubectl apply --server-side --force-conflicts --validate=false -f -
 
-# Control plane
+# Control plane (use a values file because --set/--set-string can mangle the JWT license key)
 kubectl create namespace agentgateway-system --dry-run=client -o yaml | kubectl apply -f -
+cat <<VALS > /tmp/agw-values.yaml
+licensing:
+  licenseKey: "${ENTERPRISE_AGENTGATEWAY_LICENSE_KEY}"
+VALS
 helm upgrade -i enterprise-agentgateway \
   oci://us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts/enterprise-agentgateway \
   --namespace agentgateway-system --create-namespace \
   --version "${ENTERPRISE_AGENTGATEWAY_VERSION}" \
-  --set-string licensing.licenseKey="${ENTERPRISE_AGENTGATEWAY_LICENSE_KEY}"
+  -f /tmp/agw-values.yaml
+rm /tmp/agw-values.yaml
 ```
 
 ### 5. Verify infrastructure
