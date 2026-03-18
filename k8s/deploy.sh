@@ -7,10 +7,19 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 echo "==> Creating namespace and secret..."
 kubectl apply -f "${SCRIPT_DIR}/namespace.yaml"
 if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
-  kubectl create secret generic anthropic-api-key \
-    -n cloud-cart-support \
-    --from-literal=ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY}" \
-    --dry-run=client -o yaml | kubectl apply -f -
+  # Detect which namespace the secret belongs in from secret.yaml
+  SECRET_NS=$(grep 'namespace:' "${SCRIPT_DIR}/secret.yaml" | awk '{print $2}')
+  if [ "$SECRET_NS" = "agentgateway-system" ]; then
+    kubectl create secret generic anthropic-api-key \
+      -n agentgateway-system \
+      --from-literal=Authorization="${ANTHROPIC_API_KEY}" \
+      --dry-run=client -o yaml | kubectl apply -f -
+  else
+    kubectl create secret generic anthropic-api-key \
+      -n cloud-cart-support \
+      --from-literal=ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY}" \
+      --dry-run=client -o yaml | kubectl apply -f -
+  fi
 else
   kubectl apply -f "${SCRIPT_DIR}/secret.yaml"
 fi
