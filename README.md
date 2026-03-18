@@ -215,7 +215,8 @@ k8s/
     ├── route-ai.yaml               # HTTPRoute for AI traffic
     ├── policy.yaml                 # EnterpriseAgentgatewayPolicy (prompt guards, PII masking)
     ├── model-policy.yaml           # AgentgatewayPolicy (model defaults and overrides)
-    └── rate-limit-policy.yaml      # EnterpriseAgentgatewayPolicy (rate limiting)
+    ├── rate-limit-policy.yaml      # EnterpriseAgentgatewayPolicy (rate limiting)
+    └── observability-policy.yaml   # EnterpriseAgentgatewayPolicy (telemetry and tracing)
 ```
 
 For the progressive Agent Gateway demo recipe, see [docs/recipe.md](docs/recipe.md).
