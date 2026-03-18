@@ -157,7 +157,19 @@ kubectl port-forward svc/support-service -n cloud-cart-support 8080:8080
 
 ### Ingress Gateway
 
-A kgateway `Gateway` and `HTTPRoute` expose the support-service externally. An `HTTPListenerPolicy` enables WebSocket upgrades for the `/ws` endpoint.
+Apply the kgateway `Gateway`, `HTTPRoute`, and `HTTPListenerPolicy` to expose the support-service externally and enable WebSocket upgrades:
+
+```sh
+kubectl apply -f k8s/kgateway/gateway.yaml
+kubectl apply -f k8s/kgateway/httproute.yaml
+kubectl apply -f k8s/kgateway/httplistenerpolicy.yaml
+```
+
+Or use the convenience script:
+
+```sh
+k8s/kgateway/apply.sh
+```
 
 | Resource | Kind | Namespace | Purpose |
 |---|---|---|---|
