@@ -5,7 +5,7 @@ metadata:
   namespace: agentgateway-system
 spec:
   parentRefs:
-    - name: enterprise-agentgateway
+    - name: agentgateway
   rules:
     - backendRefs:
         - group: agentgateway.dev
