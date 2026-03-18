@@ -5,7 +5,7 @@ metadata:
   namespace: agentgateway-system
 spec:
   parentRefs:
-    - name: enterprise-agentgateway
+    - name: agentgateway
       namespace: agentgateway-system
       sectionName: mcp
   rules:

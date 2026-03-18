@@ -8,7 +8,7 @@ spec:
     targets:
       - name: catalog-service
         static:
-          host: catalog-service.cloud-cart.svc
+          host: catalog-service.cloud-cart-support.svc
           port: 8080
 ---
 apiVersion: agentgateway.dev/v1alpha1
@@ -21,7 +21,7 @@ spec:
     targets:
       - name: orders-service
         static:
-          host: orders-service.cloud-cart.svc
+          host: orders-service.cloud-cart-support.svc
           port: 8080
 ---
 apiVersion: agentgateway.dev/v1alpha1
@@ -34,7 +34,7 @@ spec:
     targets:
       - name: customers-service
         static:
-          host: customers-service.cloud-cart.svc
+          host: customers-service.cloud-cart-support.svc
           port: 8080
 ---
 apiVersion: agentgateway.dev/v1alpha1
@@ -47,5 +47,5 @@ spec:
     targets:
       - name: notifications-service
         static:
-          host: notifications-service.cloud-cart.svc
+          host: notifications-service.cloud-cart-support.svc
           port: 8080
