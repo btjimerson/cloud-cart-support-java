@@ -197,7 +197,7 @@ k8s/
 ├── deploy.sh                       # Full deployment orchestrator
 ├── kgateway/
 │   ├── gateway.yaml                # Gateway (cloud-cart-gateway, port 80)
-│   ├── httproute.yaml              # HTTPRoute (/support → support-service:8080)
+│   ├── httproute.yaml              # HTTPRoute (/ → support-service:8080)
 │   ├── httplistenerpolicy.yaml     # HTTPListenerPolicy (WebSocket upgrade)
 │   └── apply.sh                    # Apply all kgateway resources
 └── agentgateway/
