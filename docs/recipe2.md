@@ -51,12 +51,12 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 
 ```bash
 helm upgrade -i enterprise-kgateway-crds \
-  oci://us-docker.pkg.dev/solo-public/gloo-gateway/charts/enterprise-kgateway-crds \
+  oci://us-docker.pkg.dev/solo-public/enterprise-kgateway/charts/enterprise-kgateway-crds \
   --namespace kgateway-system --create-namespace \
   --version "${ENTERPRISE_KGATEWAY_VERSION}"
 
 helm upgrade -i enterprise-kgateway \
-  oci://us-docker.pkg.dev/solo-public/gloo-gateway/charts/enterprise-kgateway \
+  oci://us-docker.pkg.dev/solo-public/enterprise-kgateway/charts/enterprise-kgateway \
   --namespace kgateway-system \
   --version "${ENTERPRISE_KGATEWAY_VERSION}" \
   --set licensing.licenseKey="${ENTERPRISE_KGATEWAY_LICENSE_KEY}"

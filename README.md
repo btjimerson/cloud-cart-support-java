@@ -134,11 +134,19 @@ Install Gateway API CRDs, kgateway, and Enterprise Agent Gateway:
 # Install Gateway API CRDs
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
 
-# Install kgateway (ingress)
-helm upgrade -i kgateway-crds oci://ghcr.io/kgateway-dev/charts/kgateway-crds --namespace kgateway-system --create-namespace --version v2.2.0
-helm upgrade -i kgateway oci://ghcr.io/kgateway-dev/charts/kgateway --namespace kgateway-system --version v2.2.0
+# Source .env for license keys and versions
+source .env
 
-# Install Enterprise Agent Gateway (source .env for license key first)
+# Install Solo Enterprise for kgateway (ingress)
+helm upgrade -i enterprise-kgateway-crds \
+  oci://us-docker.pkg.dev/solo-public/enterprise-kgateway/charts/enterprise-kgateway-crds \
+  --namespace kgateway-system --create-namespace --version "${ENTERPRISE_KGATEWAY_VERSION}"
+helm upgrade -i enterprise-kgateway \
+  oci://us-docker.pkg.dev/solo-public/enterprise-kgateway/charts/enterprise-kgateway \
+  --namespace kgateway-system --version "${ENTERPRISE_KGATEWAY_VERSION}" \
+  --set-string licensing.licenseKey="${ENTERPRISE_KGATEWAY_LICENSE_KEY}"
+
+# Install Solo Enterprise for Agent Gateway
 k8s/agentgateway/install.sh
 ```
 
