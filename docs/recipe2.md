@@ -64,15 +64,20 @@ helm upgrade -i enterprise-kgateway \
 
 ### 4. Install Solo Enterprise for Agent Gateway
 
-```bash
-helm upgrade -i enterprise-agentgateway-crds \
-  oci://us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts/enterprise-agentgateway-crds \
-  --namespace agentgateway-system --create-namespace \
-  --version "${ENTERPRISE_AGENTGATEWAY_VERSION}"
+> **Note:** Enterprise kgateway and Enterprise Agent Gateway share some CRDs (extauth, ratelimit). Use `helm template` + server-side apply for the CRDs to avoid ownership conflicts, then install the control plane normally.
 
+```bash
+# CRDs (server-side apply to handle shared CRD ownership with kgateway)
+helm template enterprise-agentgateway-crds \
+  oci://us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts/enterprise-agentgateway-crds \
+  --version "${ENTERPRISE_AGENTGATEWAY_VERSION}" \
+  | kubectl apply --server-side --force-conflicts -f -
+
+# Control plane
+kubectl create namespace agentgateway-system --dry-run=client -o yaml | kubectl apply -f -
 helm upgrade -i enterprise-agentgateway \
   oci://us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts/enterprise-agentgateway \
-  --namespace agentgateway-system \
+  --namespace agentgateway-system --create-namespace \
   --version "${ENTERPRISE_AGENTGATEWAY_VERSION}" \
   --set licensing.licenseKey="${ENTERPRISE_AGENTGATEWAY_LICENSE_KEY}"
 ```

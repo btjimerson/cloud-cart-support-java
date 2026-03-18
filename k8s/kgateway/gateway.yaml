@@ -4,7 +4,7 @@ metadata:
   name: cloud-cart-gateway
   namespace: kgateway-system
 spec:
-  gatewayClassName: kgateway
+  gatewayClassName: enterprise-kgateway
   listeners:
     - name: http
       protocol: HTTP
