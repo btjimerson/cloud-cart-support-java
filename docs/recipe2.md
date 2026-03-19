@@ -266,9 +266,12 @@ BEFORE:                                AFTER:
 - `k8s/agentgateway/backend-anthropic.yaml` — AgentgatewayBackend with `backendAuth` referencing the API key Secret
 - `k8s/agentgateway/gateway.yaml` — Gateway (enterprise-agentgateway class, port 8080)
 - `k8s/agentgateway/route-ai.yaml` — HTTPRoute routing LLM traffic to the Anthropic backend
+- `k8s/agentgateway/policy-ai-routes.yaml` — EnterpriseAgentgatewayPolicy enabling bidirectional protocol translation between Anthropic `/v1/messages` format and OpenAI `/v1/chat/completions` format
 
 **Secret moved:**
 - `k8s/secret.yaml` — now in `agentgateway-system` namespace with `Authorization: <key>` format (the gateway translates this to `x-api-key` for Anthropic)
+
+> **Protocol Translation:** The Agent Gateway acts as a universal LLM proxy. The `ai-routes` policy enables the gateway to accept requests in either OpenAI format (`/v1/chat/completions`) or Anthropic native format (`/v1/messages` with content blocks), and automatically translate to the backend provider's native API. This means your application code doesn't need to change if you switch LLM providers — only the `AgentgatewayBackend` configuration changes.
 
 ### Deploy
 
@@ -354,8 +357,8 @@ BEFORE:                                AFTER:
 
 **CRDs added:**
 - `k8s/agentgateway/policy.yaml` — EnterpriseAgentgatewayPolicy with:
-  - `promptGuard.request.customResponse.reject` — patterns for violence, weapons, drugs, hacking, fraud, etc.
-  - `promptGuard.request.customResponse.mask.builtins` — CREDIT_CARD, SSN, EMAIL, PHONE_NUMBER
+  - `backend.ai.promptGuard.request[].regex` — rejection patterns for violence, weapons, drugs, hacking, fraud, etc. (action: Reject, HTTP 403)
+  - `backend.ai.promptGuard.request[].regex.builtins` — PII masking for CreditCard, Ssn, Email, PhoneNumber (action: Mask)
 
 ### Deploy
 
@@ -415,9 +418,11 @@ Model configuration managed via `AgentgatewayPolicy`. The app uses a placeholder
 - `application.yml` — model changed to `placeholder`, max-tokens removed
 - `BaseToolAgent.java` and `RouterAgent.java` — hardcoded model references removed
 
+**CRDs changed:**
+- `k8s/agentgateway/backend-anthropic.yaml` — `anthropic.model` set to `claude-sonnet-4-5-20250929` (the backend-level model overrides whatever the client sends, so the app's `placeholder` value is replaced)
+
 **CRDs added:**
 - `k8s/agentgateway/model-policy.yaml` — AgentgatewayPolicy with:
-  - `defaults.model: claude-sonnet-4-5-20250929`
   - `defaults.temperature: 0.7`
   - `overrides.max_tokens: 4096`
 
@@ -472,8 +477,7 @@ Remove `RateLimitService` entirely. Add `EnterpriseAgentgatewayPolicy` with requ
 
 **CRDs added:**
 - `k8s/agentgateway/rate-limit-policy.yaml` — EnterpriseAgentgatewayPolicy with:
-  - `traffic.rateLimit.local.requests: 20` per minute
-  - `traffic.rateLimit.tokenBudget: 50000` tokens per hour
+  - `traffic.rateLimit.local[].requests: 20` per minute with burst of 5
 
 ### Deploy
 
@@ -503,7 +507,7 @@ done
 # Later requests should return 429 (Too Many Requests)
 ```
 
-> **Demo talking point:** Show the diff — 53 lines of Java code plus tests replaced by a YAML policy. Rate limits now work across replicas, include token budgets, and can be changed without code deploys.
+> **Demo talking point:** Show the diff — 53 lines of Java code plus tests replaced by a YAML policy. Rate limits now work across replicas and can be changed without code deploys. The gateway also supports global distributed rate limiting via `RateLimitConfig` CRDs for production use.
 
 ---
 
@@ -532,8 +536,7 @@ Add gateway-level observability with Prometheus metrics and OpenTelemetry tracin
 
 **CRDs added:**
 - `k8s/agentgateway/observability-policy.yaml` — EnterpriseAgentgatewayPolicy with:
-  - `observability.metrics.prometheus: enabled`
-  - `observability.tracing.otlp.endpoint`
+  - `frontend.accessLog.attributes` — custom access log attributes for AI request metadata (model, client ID)
 
 ### Deploy
 
@@ -738,7 +741,7 @@ Ensure the backend hostnames in `backends-mcp.yaml` match the actual service nam
 
 ### Rate limit triggering unexpectedly (Step 4)
 
-Check the policy unit — `requests: 20` with `unit: MINUTE` means 20 per minute, not per second.
+Check the policy unit — `requests: 20` with `unit: Minutes` means 20 per minute, not per second.
 
 ```bash
 kubectl get enterpriseagentgatewaypolicy -n agentgateway-system -o yaml
@@ -775,6 +778,10 @@ The Gateway resource **must not** be named `enterprise-agentgateway` — that na
 
 ### Content blocks format (Spring AI)
 
-The Agent Gateway proxy (v2.1.x) does not support Anthropic's content blocks format (`"content": [{"type":"text","text":"..."}]`). Spring AI's Anthropic client uses this format, which causes 400 errors from the gateway. Workarounds:
-- Use plain string `content` fields in direct API calls
-- Switch the app to use Spring AI's OpenAI adapter (the gateway presents an OpenAI-compatible API)
+Agent Gateway 2.2.x supports Anthropic's content blocks format (`"content": [{"type":"text","text":"..."}]`) via the `ai-routes` policy. If you see `"messages: at least one message is required"` errors, ensure:
+1. You are running Agent Gateway **2.2.0-beta.4+** (not 2.1.x)
+2. The `policy-ai-routes.yaml` is applied, which enables bidirectional protocol translation between `/v1/messages` and `/v1/chat/completions`
+
+### Model "placeholder" 404
+
+If you see `"model: placeholder"` errors from Anthropic (HTTP 404), the model is not being overridden. Set the model on the `AgentgatewayBackend` resource (`spec.ai.provider.anthropic.model`) rather than using `AgentgatewayPolicy` overrides — backend-level model configuration takes precedence over client-sent values.
