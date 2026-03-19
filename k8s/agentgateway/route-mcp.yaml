@@ -7,9 +7,12 @@ spec:
   parentRefs:
     - name: agentgateway
       namespace: agentgateway-system
-      sectionName: mcp
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /mcp
+      backendRefs:
         - name: catalog-mcp
           namespace: agentgateway-system
           group: agentgateway.dev
