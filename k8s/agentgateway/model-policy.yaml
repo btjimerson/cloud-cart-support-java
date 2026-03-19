@@ -14,7 +14,5 @@ spec:
         - field: temperature
           value: "0.7"
       overrides:
-        - field: model
-          value: claude-sonnet-4-5-20250929
         - field: max_tokens
           value: "4096"
