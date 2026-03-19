@@ -11,6 +11,6 @@ spec:
   traffic:
     rateLimit:
       local:
-        - requests: 20
-          unit: Minutes
-          burst: 5
+        - requests: 3
+          unit: Seconds
+          burst: 3
