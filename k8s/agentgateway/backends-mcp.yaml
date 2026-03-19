@@ -10,6 +10,7 @@ spec:
         static:
           host: catalog-service.cloud-cart-support.svc
           port: 8080
+          protocol: SSE
 ---
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayBackend
@@ -23,6 +24,7 @@ spec:
         static:
           host: orders-service.cloud-cart-support.svc
           port: 8080
+          protocol: SSE
 ---
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayBackend
@@ -36,6 +38,7 @@ spec:
         static:
           host: customers-service.cloud-cart-support.svc
           port: 8080
+          protocol: SSE
 ---
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayBackend
@@ -49,3 +52,4 @@ spec:
         static:
           host: notifications-service.cloud-cart-support.svc
           port: 8080
+          protocol: SSE
