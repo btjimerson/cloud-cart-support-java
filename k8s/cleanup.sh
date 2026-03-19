@@ -32,7 +32,11 @@ helm uninstall enterprise-kgateway -n kgateway-system 2>/dev/null || true
 helm uninstall enterprise-kgateway-crds -n kgateway-system 2>/dev/null || true
 kubectl delete namespace kgateway-system --ignore-not-found --wait=false
 
-# --- 4. Remove Gateway API CRDs ---
+# --- 4. Remove leftover Solo/agentgateway CRDs ---
+echo "==> Removing Solo/agentgateway CRDs..."
+kubectl get crds -o name | grep 'solo\|agentgateway' | xargs kubectl delete --ignore-not-found 2>/dev/null || true
+
+# --- 5. Remove Gateway API CRDs ---
 echo "==> Removing Gateway API CRDs..."
 kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml 2>/dev/null || true
 
