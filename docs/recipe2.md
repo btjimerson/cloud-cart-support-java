@@ -290,8 +290,6 @@ graph LR
 **Secret moved:**
 - `k8s/secret.yaml` — now in `agentgateway-system` namespace with `Authorization: <key>` format (the gateway translates this to `x-api-key` for Anthropic)
 
-> **Protocol Translation:** The Agent Gateway acts as a universal LLM proxy. The `ai-routes` policy enables the gateway to accept requests in either OpenAI format (`/v1/chat/completions`) or Anthropic native format (`/v1/messages` with content blocks), and automatically translate to the backend provider's native API. This means your application code doesn't need to change if you switch LLM providers — only the `AgentgatewayBackend` configuration changes.
-
 ### Deploy
 
 ```bash
@@ -306,6 +304,8 @@ kubectl create secret generic anthropic-api-key \
 # Deploy application + Agent Gateway CRDs
 k8s/deploy.sh
 ```
+
+> **Protocol Translation:** The Agent Gateway acts as a universal LLM proxy. The `ai-routes` policy enables the gateway to accept requests in either OpenAI format (`/v1/chat/completions`) or Anthropic native format (`/v1/messages` with content blocks), and automatically translate to the backend provider's native API. This means your application code doesn't need to change if you switch LLM providers — only the `AgentgatewayBackend` configuration changes.
 
 ### Verify
 
@@ -536,6 +536,20 @@ kubectl get agentgatewaypolicy anthropic-model-policy -n agentgateway-system -o 
 
 Remove `RateLimitService` entirely. Add `EnterpriseAgentgatewayPolicy` with request-based and token-based rate limiting enforced at the gateway.
 
+### Architecture (Before → After)
+
+**Before:**
+```mermaid
+graph LR
+    User([User]) --> RL[RateLimitService<br/>in-memory counters<br/>single-replica only] --> LLM[(LLM)]
+```
+
+**After:**
+```mermaid
+graph LR
+    User([User]) --> AGW[Agent Gateway<br/>rateLimit policy<br/>works across replicas] --> LLM[(LLM)]
+```
+
 ### What Changes
 
 **Code removed:**
@@ -757,16 +771,11 @@ grep -A2 mcp support-service/src/main/resources/application.yml
 
 Uninstall everything and restore the cluster to its original state.
 
-### Delete application resources
-
 ```bash
+# Delete application namespace
 kubectl delete namespace cloud-cart-support --ignore-not-found
-```
 
-### Delete Agent Gateway resources
-
-```bash
-# Delete any Agent Gateway CRDs (policies, backends, routes)
+# Delete Agent Gateway CRDs (policies, backends, routes)
 kubectl delete agentgatewaybackend --all -n agentgateway-system --ignore-not-found
 kubectl delete agentgatewaypolicy --all -n agentgateway-system --ignore-not-found
 kubectl delete enterpriseagentgatewaypolicy --all -n agentgateway-system --ignore-not-found
@@ -778,36 +787,24 @@ kubectl delete secret anthropic-api-key -n agentgateway-system --ignore-not-foun
 helm uninstall enterprise-agentgateway -n agentgateway-system
 helm uninstall enterprise-agentgateway-crds -n agentgateway-system
 kubectl delete namespace agentgateway-system --ignore-not-found
-```
 
-### Delete kgateway resources
-
-```bash
+# Delete kgateway resources
 kubectl delete gateway cloud-cart-gateway -n kgateway-system --ignore-not-found
 kubectl delete httproute --all -n cloud-cart-support --ignore-not-found
 kubectl delete httplistenerpolicy --all -n kgateway-system --ignore-not-found
 
+# Uninstall Enterprise kgateway
 helm uninstall enterprise-kgateway -n kgateway-system
 helm uninstall enterprise-kgateway-crds -n kgateway-system
 kubectl delete namespace kgateway-system --ignore-not-found
-```
 
-### Remove Solo/agentgateway CRDs
-
-```bash
-# Helm uninstall doesn't always remove all CRDs — clean up any leftovers
+# Remove leftover Solo/agentgateway CRDs
 kubectl get crds -o name | grep 'solo\|agentgateway' | xargs kubectl delete --ignore-not-found
-```
 
-### Remove Gateway API CRDs
-
-```bash
+# Remove Gateway API CRDs
 kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
-```
 
-### Return to main branch
-
-```bash
+# Return to main branch
 git checkout main
 ```
 
