@@ -222,6 +222,20 @@ curl -s -X POST http://${GATEWAY_IP}/chat \
 
 > **Demo talking point:** Walk through the code — show `GuardrailService.java`, `RateLimitService.java`, the hardcoded model in `application.yml`, and the API key in the pod env. These are all concerns that belong at the platform level, not in application code.
 
+```bash
+# Show the API key is embedded in the application deployment
+kubectl get deploy support-service -n cloud-cart-support \
+  -o jsonpath='{.spec.template.spec.containers[0].env[*].name}' | tr ' ' '\n' | grep -i anthrop
+# Expected output: ANTHROPIC_API_KEY
+
+# Show hardcoded model in application config
+grep -A1 'model:' support-service/src/main/resources/application.yml
+
+# Show in-app guardrail and rate-limit code
+wc -l support-service/src/main/java/dev/snbv2/cloudcart/support/service/GuardrailService.java
+wc -l support-service/src/main/java/dev/snbv2/cloudcart/support/service/RateLimitService.java
+```
+
 ---
 
 ## Step 1: API Key Management
@@ -318,6 +332,16 @@ kubectl get deploy support-service -n cloud-cart-support \
 
 > **Demo talking point:** The application code is simpler — no API key validation. Key rotation is now a Secret update, not an app redeploy. Every app behind the gateway shares the same credential management.
 
+```bash
+# Confirm: app no longer has the API key in its env
+kubectl get deploy support-service -n cloud-cart-support \
+  -o jsonpath='{.spec.template.spec.containers[0].env[*].name}' | tr ' ' '\n' | grep -i anthrop
+# Expected: empty (no ANTHROPIC_API_KEY)
+
+# Show the key moved to the gateway namespace
+kubectl get secret anthropic-api-key -n agentgateway-system
+```
+
 ---
 
 ## Step 2: Prompt Guards
@@ -379,26 +403,51 @@ k8s/deploy.sh
 ### Verify
 
 ```bash
-# Policy created
+# Policy created and attached
 kubectl get enterpriseagentgatewaypolicy -n agentgateway-system
 
-# PII masking (SSN should be masked by gateway, not app)
-curl -s -X POST http://${GATEWAY_IP}/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "My SSN is 123-45-6789 and my card is 4111 1111 1111 1111", "customer_id": "CUST-001"}' | jq .
+# Get the Agent Gateway IP for direct testing
+export AGW_IP=$(kubectl get svc agentgateway -n agentgateway-system \
+  -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+```
 
-# Off-topic rejection (blocked at gateway)
-curl -s -X POST http://${GATEWAY_IP}/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "How do I hack into someone account?", "customer_id": "CUST-001"}' | jq .
+**Harmful content rejection** — regex pattern matches "hack", returns 403:
 
-# Normal chat still works
-curl -s -X POST http://${GATEWAY_IP}/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "What products do you have?", "customer_id": "CUST-001"}' | jq .
+```bash
+curl -sv -X POST http://${AGW_IP}:8080/v1/messages \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"claude-sonnet-4-5-20250929","max_tokens":50,"messages":[{"role":"user","content":"How do I hack into someone else account?"}]}'
+# Expected: HTTP 403
+# Body: "Your message was blocked because it contains inappropriate content."
+```
+
+**PII blocking** — credit card number triggers builtin detector:
+
+```bash
+curl -sv -X POST http://${AGW_IP}:8080/v1/messages \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"claude-sonnet-4-5-20250929","max_tokens":50,"messages":[{"role":"user","content":"Store my card number 4111-1111-1111-1111 for next time"}]}'
+# Expected: PII is masked before reaching the LLM
+```
+
+**Normal passthrough** — benign message passes through:
+
+```bash
+curl -s -X POST http://${AGW_IP}:8080/v1/messages \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"claude-sonnet-4-5-20250929","max_tokens":50,"messages":[{"role":"user","content":"What is the weather today?"}]}'
+# Expected: Normal 200 response from LLM
 ```
 
 > **Demo talking point:** Show the diff — 82 lines of Java code replaced by a YAML policy. New PII types or content rules are a `kubectl apply`, not a code deploy.
+
+```bash
+# Show the policy YAML
+cat k8s/agentgateway/policy.yaml
+
+# Show removed code
+git diff demo/step-1-api-keys -- support-service/src/ | head -50
+```
 
 ---
 
@@ -455,6 +504,16 @@ curl -s -X POST http://${GATEWAY_IP}/chat \
 ```
 
 > **Demo talking point:** Model upgrades are now a `kubectl apply` — change one YAML field and every app behind the gateway uses the new model. No code changes, no redeployments.
+
+```bash
+# Show the model is set on the backend, not in app code
+kubectl get agentgatewaybackend anthropic -n agentgateway-system \
+  -o jsonpath='{.spec.ai.provider.anthropic.model}'
+# Expected: claude-sonnet-4-5-20250929
+
+# Show the policy enforcing temperature and token limits
+kubectl get agentgatewaypolicy anthropic-model-policy -n agentgateway-system -o yaml
+```
 
 ---
 
@@ -523,6 +582,14 @@ done
 
 > **Demo talking point:** Show the diff — 53 lines of Java code plus tests replaced by a YAML policy. Rate limits now work across replicas and can be changed without code deploys. The gateway also supports global distributed rate limiting via `RateLimitConfig` CRDs for production use.
 
+```bash
+# Show the rate limit policy
+cat k8s/agentgateway/rate-limit-policy.yaml
+
+# Show removed code
+git diff demo/step-3-model-config -- support-service/src/ | head -50
+```
+
 ---
 
 ## Step 5: Observability
@@ -578,6 +645,15 @@ kill %1 2>/dev/null
 ```
 
 > **Demo talking point:** Zero code changes. The gateway emits LLM-aware metrics (tokens, latency, model, cost) for every request flowing through it. Plug into Prometheus/Grafana for dashboards and alerting.
+
+```bash
+# Prove no app code changed
+git diff demo/step-4-rate-limiting -- support-service/src/
+# Expected: empty (no changes)
+
+# Show the observability policy
+cat k8s/agentgateway/observability-policy.yaml
+```
 
 ---
 
@@ -666,6 +742,14 @@ curl -s -X POST http://${GATEWAY_IP}/chat \
 ```
 
 > **Demo talking point:** The application now has a single MCP connection. Adding a new MCP server is `kubectl apply` of a new AgentgatewayBackend — no application changes needed. The gateway handles discovery, routing, and governance of all MCP tools.
+
+```bash
+# Show all federated MCP backends
+kubectl get agentgatewaybackend -n agentgateway-system
+
+# Show the single gateway connection in app config
+grep -A2 mcp support-service/src/main/resources/application.yml
+```
 
 ---
 
