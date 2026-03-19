@@ -1,0 +1,17 @@
+apiVersion: enterpriseagentgateway.solo.io/v1alpha1
+kind: EnterpriseAgentgatewayPolicy
+metadata:
+  name: ai-routes-policy
+  namespace: agentgateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: anthropic-route
+  backend:
+    ai:
+      routes:
+        "/v1/chat/completions": Completions
+        "/v1/messages": Messages
+        "/v1/models": Models
+        "*": Passthrough
