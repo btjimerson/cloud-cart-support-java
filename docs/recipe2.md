@@ -13,6 +13,7 @@ A step-by-step walkthrough for demonstrating progressive migration from in-app A
 - [Step 4: Rate Limiting](#step-4-rate-limiting)
 - [Step 5: Observability](#step-5-observability)
 - [Step 6: MCP Federation](#step-6-mcp-federation)
+- [Step 7: Declarative Agents](#step-7-declarative-agents)
 - [Cleanup](#cleanup)
 - [Troubleshooting](#troubleshooting)
 
@@ -87,7 +88,32 @@ helm upgrade -i enterprise-agentgateway \
 rm /tmp/agw-values.yaml
 ```
 
-### 5. Verify infrastructure
+### 5. Install Solo Enterprise for Kagent (Step 7 only)
+
+> **Note:** Only install kagent if you plan to run Step 7 (Declarative Agents). Steps 0–6 do not require kagent.
+
+```bash
+# Create namespace and JWT secret for kagent auth
+kubectl create namespace kagent --dry-run=client -o yaml | kubectl apply -f -
+openssl genrsa -out /tmp/key.pem 2048
+kubectl create secret generic jwt -n kagent \
+  --from-file=jwt=/tmp/key.pem --dry-run=client -o yaml | kubectl apply -f -
+rm /tmp/key.pem
+
+# Install CRDs
+helm upgrade -i kagent-crds \
+  oci://us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts/kagent-enterprise-crds \
+  -n kagent --create-namespace \
+  --version "${ENTERPRISE_KAGENT_VERSION}"
+
+# Install control plane
+helm upgrade -i kagent \
+  oci://us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts/kagent-enterprise \
+  -n kagent \
+  --version "${ENTERPRISE_KAGENT_VERSION}"
+```
+
+### 6. Verify infrastructure
 
 ```bash
 # kgateway pods
@@ -102,7 +128,7 @@ kubectl get gatewayclasses
 
 All pods should be `Running` and both `enterprise-kgateway` and `enterprise-agentgateway` GatewayClasses should show `Accepted`.
 
-### 6. Apply kgateway ingress resources
+### 7. Apply kgateway ingress resources
 
 > **Note:** The HTTPRoute is in the `cloud-cart-support` namespace. Apply the Gateway and policy first, then apply the HTTPRoute after deploying the application (Step 0) which creates the namespace.
 
@@ -767,6 +793,135 @@ grep -A2 mcp support-service/src/main/resources/application.yml
 
 ---
 
+## Step 7: Declarative Agents
+
+**Branch:** `demo/step-7-declarative-agents`
+
+### Current State
+
+The application runs a custom, in-process multi-agent system in Java/Spring Boot:
+- 5 agent classes (RouterAgent, OrderAgent, ProductAgent, ReturnsAgent, ComplaintAgent)
+- HandoffManager for inter-agent routing
+- BaseToolAgent wiring Spring AI's tool-calling loop
+- AgentRegistry (ConcurrentHashMap) for agent lookup
+- AiConfig wiring all agents, tools, and prompts together
+- ~80% of the support-service code is agent orchestration
+
+### Challenges
+
+- Agent definitions, system prompts, and tool bindings are all in Java code
+- Adding or modifying an agent requires code changes and redeployment
+- No standardized inter-agent protocol (custom handoff mechanism)
+- Agent scaling is tied to the monolith — can't scale agents independently
+- No external visibility into agent definitions (`kubectl get agents` doesn't work)
+
+### Desired Outcome
+
+Replace all Java agent orchestration with kagent Kubernetes CRDs. Agent definitions, system prompts, model config, and tool bindings become declarative YAML. The support-service shrinks to just the UI + A2A client.
+
+### Architecture (Before → After)
+
+**Before:**
+```mermaid
+graph LR
+    User([User]) --> SS[support-service<br/>RouterAgent + HandoffManager<br/>+ 4 specialist agents<br/>+ AgentRegistry + AiConfig]
+    SS -- "Spring AI" --> AGW[Agent Gateway]
+    AGW --> Anthropic[(Anthropic)]
+    SS -- "Spring AI MCP" --> AGW2[Agent Gateway MCP]
+```
+_Agent orchestration is Java code inside the monolith_
+
+**After:**
+```mermaid
+graph LR
+    User([User]) --> SS[support-service<br/>UI + A2A client only]
+    SS -- "A2A protocol" --> KA[kagent controller]
+    KA --> RA[router-agent CR]
+    RA --> OA[order-agent CR]
+    RA --> PA[product-agent CR]
+    RA --> RetA[returns-agent CR]
+    RA --> CA[complaint-agent CR]
+    KA -- "via ModelConfig" --> AGW[Agent Gateway]
+    AGW --> Anthropic[(Anthropic)]
+    OA & PA & RetA & CA -. "RemoteMCPServer" .-> MCP[MCP services]
+    style KA fill:#4af,stroke:#333,color:#fff
+```
+_Agent orchestration is Kubernetes CRDs managed by kagent_
+
+### What Changes
+
+**Code removed (~3,400 lines):**
+- All agent classes: `Agent.java`, `BaseToolAgent.java`, `RouterAgent.java`, `OrderAgent.java`, `ProductAgent.java`, `ReturnsAgent.java`, `ComplaintAgent.java`
+- `AgentRegistry.java`, `HandoffManager.java`, `AiConfig.java`
+- All `*ToolsService.java` classes
+- Spring AI Anthropic and MCP client dependencies from `pom.xml`
+- All corresponding tests
+
+**Code added (~150 lines):**
+- `A2AClient.java` — HTTP client that invokes kagent agents via the A2A protocol
+
+**Code changed:**
+- `ChatController.java` — calls `A2AClient.invoke("router-agent", ...)` instead of `routerAgent.handle(...)`
+- `ChatWebSocketHandler.java` — same A2A client change
+- `HealthController.java` — reports `agent_runtime: kagent` with static agent list
+- `application.yml` — Spring AI config removed, replaced with `kagent.a2a.base-url` and `kagent.a2a.namespace`
+- `support-service.yaml` — new image tag, env vars `KAGENT_A2A_URL` and `KAGENT_NAMESPACE`
+
+**CRDs added (in `k8s/kagent/`):**
+- `model-config.yaml` — ModelConfig pointing to agentgateway (`provider: OpenAI`, `baseUrl` = gateway service)
+- `remote-mcp-servers.yaml` — 4 RemoteMCPServer resources (catalog, orders, customers, notifications)
+- `agents.yaml` — 5 Agent CRs: router-agent (with agent-as-tool references) + 4 specialist agents (with MCP tool references and system prompts)
+
+### Deploy
+
+```bash
+git checkout demo/step-7-declarative-agents
+
+# kagent must be installed first (see Environment Setup)
+
+# Deploy application + kagent CRDs
+k8s/deploy.sh
+```
+
+### Verify
+
+```bash
+# Agents are now Kubernetes resources
+kubectl get agents -n kagent
+
+# ModelConfig points to agentgateway
+kubectl get modelconfig -n kagent -o yaml
+
+# RemoteMCPServers discovered tools
+kubectl get remotemcpserver -n kagent
+
+# Router agent card via A2A
+kubectl port-forward svc/kagent-controller -n kagent 8083:8083 &
+sleep 2
+curl -s localhost:8083/api/a2a/kagent/router-agent/.well-known/agent.json | jq .
+kill %1 2>/dev/null
+
+# Chat still works (now via kagent A2A)
+curl -s -X POST http://${GATEWAY_IP}/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Where is my order ORD-2024-0003?", "customer_id": "CUST-003"}' | jq .
+```
+
+> **Demo talking point:** Show the massive code reduction — 3,400 lines of Java replaced by ~150 lines of code + YAML CRDs. Agent definitions are now visible with `kubectl get agents`. System prompt changes are `kubectl edit agent order-agent` — no rebuild needed. All gateway policies (prompt guards, rate limits, observability) still apply because kagent routes through agentgateway.
+
+```bash
+# Show agents as Kubernetes resources
+kubectl get agents -n kagent
+
+# Show the router agent definition
+kubectl get agent router-agent -n kagent -o yaml
+
+# Show the massive code reduction
+git diff --stat demo/step-6-mcp-federation
+```
+
+---
+
 ## Cleanup
 
 Uninstall everything and restore the cluster to its original state.
@@ -774,6 +929,15 @@ Uninstall everything and restore the cluster to its original state.
 ```bash
 # Delete application namespace
 kubectl delete namespace cloud-cart-support --ignore-not-found
+
+# Delete kagent resources
+kubectl delete agent --all -n kagent --ignore-not-found
+kubectl delete modelconfig --all -n kagent --ignore-not-found
+kubectl delete remotemcpserver --all -n kagent --ignore-not-found
+helm uninstall kagent -n kagent || true
+helm uninstall kagent-crds -n kagent || true
+kubectl get crds -o name | grep kagent | xargs kubectl delete --ignore-not-found
+kubectl delete namespace kagent --ignore-not-found
 
 # Delete Agent Gateway CRDs (policies, backends, routes)
 kubectl delete agentgatewaybackend --all -n agentgateway-system --ignore-not-found
