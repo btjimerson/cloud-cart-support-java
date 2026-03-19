@@ -435,6 +435,7 @@ kubectl get enterpriseagentgatewaypolicy -n agentgateway-system
 # Get the Agent Gateway IP for direct testing
 export AGW_IP=$(kubectl get svc agentgateway -n agentgateway-system \
   -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+echo "Agent Gateway IP: $AGW_IP"
 ```
 
 **Harmful content rejection** — regex pattern matches "hack", returns 403:
@@ -609,6 +610,7 @@ curl -s -X POST http://${GATEWAY_IP}/chat \
 # (testing through the app hides 429s because the app catches gateway errors)
 export AGW_IP=$(kubectl get svc agentgateway -n agentgateway-system \
   -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+echo "Agent Gateway IP: $AGW_IP"
 
 for i in $(seq 1 10); do
   STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
