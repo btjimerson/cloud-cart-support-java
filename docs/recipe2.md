@@ -492,19 +492,24 @@ k8s/deploy.sh
 # Policy created
 kubectl get enterpriseagentgatewaypolicy -n agentgateway-system
 
-# Normal request works
+# Normal request through the app still works
 curl -s -X POST http://${GATEWAY_IP}/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Hello!", "customer_id": "CUST-001"}' | jq .
 
-# Rapid-fire test (send 10 requests to trigger rate limit)
+# Test rate limiting directly against the Agent Gateway
+# (testing through the app hides 429s because the app catches gateway errors)
+export AGW_IP=$(kubectl get svc agentgateway -n agentgateway-system \
+  -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
 for i in $(seq 1 10); do
-  STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${GATEWAY_IP}/chat \
+  STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+    -X POST http://${AGW_IP}:8080/v1/messages \
     -H "Content-Type: application/json" \
-    -d '{"message": "Hello!", "customer_id": "CUST-001"}')
+    -d '{"model":"claude-sonnet-4-5-20250929","max_tokens":1,"messages":[{"role":"user","content":"hi"}]}')
   echo "Request $i: HTTP $STATUS"
 done
-# First 5 requests succeed (3 base + 2 burst), then 429 (Too Many Requests)
+# First 3-5 requests succeed, then 429 (Too Many Requests)
 ```
 
 > **Demo talking point:** Show the diff — 53 lines of Java code plus tests replaced by a YAML policy. Rate limits now work across replicas and can be changed without code deploys. The gateway also supports global distributed rate limiting via `RateLimitConfig` CRDs for production use.
