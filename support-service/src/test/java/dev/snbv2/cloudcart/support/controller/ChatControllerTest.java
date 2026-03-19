@@ -22,7 +22,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(properties = {"spring.ai.anthropic.api-key=test-key"})
+@TestPropertySource(properties = {
+        "kagent.a2a.base-url=http://localhost:8083",
+        "kagent.a2a.namespace=kagent"
+})
 class ChatControllerTest {
 
     @Autowired

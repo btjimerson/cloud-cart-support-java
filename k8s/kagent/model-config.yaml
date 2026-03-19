@@ -1,0 +1,12 @@
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: anthropic-via-gateway
+  namespace: kagent
+spec:
+  provider: OpenAI
+  model: claude-sonnet-4-5-20250929
+  apiKeySecret: kagent-llm-key
+  apiKeySecretKey: API_KEY
+  openAI:
+    baseUrl: "http://agentgateway.agentgateway-system.svc:8080"

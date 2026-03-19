@@ -24,7 +24,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * referential integrity between orders and customers.
  */
 @SpringBootTest
-@TestPropertySource(properties = {"spring.ai.anthropic.api-key=test-key"})
+@TestPropertySource(properties = {
+        "kagent.a2a.base-url=http://localhost:8083",
+        "kagent.a2a.namespace=kagent"
+})
 class DataSeederTest {
 
     @Autowired
