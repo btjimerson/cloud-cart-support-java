@@ -477,7 +477,7 @@ Remove `RateLimitService` entirely. Add `EnterpriseAgentgatewayPolicy` with requ
 
 **CRDs added:**
 - `k8s/agentgateway/rate-limit-policy.yaml` — EnterpriseAgentgatewayPolicy with:
-  - `traffic.rateLimit.local[].requests: 20` per minute with burst of 5
+  - `traffic.rateLimit.local[].requests: 3` per minute with burst of 2 (5 total before throttling)
 
 ### Deploy
 
@@ -497,14 +497,14 @@ curl -s -X POST http://${GATEWAY_IP}/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Hello!", "customer_id": "CUST-001"}' | jq .
 
-# Rapid-fire test (send 10 requests quickly to trigger rate limit)
+# Rapid-fire test (send 10 requests to trigger rate limit)
 for i in $(seq 1 10); do
   STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://${GATEWAY_IP}/chat \
     -H "Content-Type: application/json" \
     -d '{"message": "Hello!", "customer_id": "CUST-001"}')
   echo "Request $i: HTTP $STATUS"
 done
-# First 6 requests succeed (3 base + 3 burst), then 429 (Too Many Requests)
+# First 5 requests succeed (3 base + 2 burst), then 429 (Too Many Requests)
 ```
 
 > **Demo talking point:** Show the diff — 53 lines of Java code plus tests replaced by a YAML policy. Rate limits now work across replicas and can be changed without code deploys. The gateway also supports global distributed rate limiting via `RateLimitConfig` CRDs for production use.
