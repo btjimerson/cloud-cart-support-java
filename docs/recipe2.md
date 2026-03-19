@@ -159,24 +159,24 @@ A working baseline to demonstrate the application and compare against gateway-ma
 
 ### Architecture
 
-```
-                    ┌─────────────────────────────────────────┐
-                    │            support-service              │
-                    │  ┌──────────┐  ┌────────────────────┐  │
-  User ──────────── │  │ Guardrail│  │   Router Agent      │  │──── Anthropic API
-                    │  │ Service  │  │ (hardcoded model)   │  │     (direct, with
-                    │  └──────────┘  │                     │  │      API key)
-                    │  ┌──────────┐  │  ┌──────┐ ┌──────┐ │  │
-                    │  │RateLimit │  │  │Order │ │Prod. │ │  │
-                    │  │ Service  │  │  │Agent │ │Agent │ │  │
-                    │  └──────────┘  │  └──────┘ └──────┘ │  │
-                    │                └────────────────────┘  │
-                    └────────┬───────────┬──────────┬────────┘
-                             │           │          │
-                    ┌────────┘    ┌──────┘   ┌──────┘
-                    ▼             ▼           ▼
-              catalog-svc   orders-svc   customers-svc  notifications-svc
-              (MCP tools)   (MCP tools)  (MCP tools)    (MCP tools)
+```mermaid
+graph LR
+    User([User]) --> SS
+
+    subgraph SS [support-service]
+        GS[GuardrailService]
+        RL[RateLimitService]
+        RA[Router Agent<br/>hardcoded model]
+        OA[Order Agent]
+        PA[Product Agent]
+    end
+
+    SS -- "API key in env" --> Anthropic[(Anthropic API)]
+
+    SS --> Cat[catalog-service<br/>MCP tools]
+    SS --> Ord[orders-service<br/>MCP tools]
+    SS --> Cust[customers-service<br/>MCP tools]
+    SS --> Notif[notifications-service<br/>MCP tools]
 ```
 
 ### Deploy
@@ -245,12 +245,17 @@ The application points to Enterprise Agent Gateway instead of Anthropic. The gat
 
 ### Architecture (Before → After)
 
+**Before:**
+```mermaid
+graph LR
+    App[support-service] -- "API key in env" --> Anthropic[(Anthropic API)]
 ```
-BEFORE:                                AFTER:
 
-  App ──[API key]──► Anthropic         App ──[no key]──► Agent Gateway ──[API key]──► Anthropic
-                                                         (injects key
-                                                          from Secret)
+**After:**
+```mermaid
+graph LR
+    App[support-service] -- "no API key" --> AGW[Agent Gateway]
+    AGW -- "injects key<br/>from Secret" --> Anthropic[(Anthropic API)]
 ```
 
 ### What Changes
@@ -339,12 +344,16 @@ Remove `GuardrailService` entirely. Replace with an `EnterpriseAgentgatewayPolic
 
 ### Architecture (Before → After)
 
+**Before:**
+```mermaid
+graph LR
+    User([User]) --> GS[GuardrailService<br/>in-app regex] --> LLM[(LLM)]
 ```
-BEFORE:                                AFTER:
 
-  User ──► [GuardrailService] ──► LLM  User ──► Agent Gateway ──► LLM
-            (in-app regex)                      [promptGuard policy]
-                                                (built-in detectors)
+**After:**
+```mermaid
+graph LR
+    User([User]) --> AGW[Agent Gateway<br/>promptGuard policy<br/>built-in detectors] --> LLM[(LLM)]
 ```
 
 ### What Changes
@@ -597,17 +606,28 @@ The gateway federates all MCP backends. The application connects to a single gat
 
 ### Architecture (Before → After)
 
+**Before:**
+```mermaid
+graph LR
+    App[support-service] --> Cat[catalog-service]
+    App --> Ord[orders-service]
+    App --> Cust[customers-service]
+    App --> Notif[notifications-service]
+    style App fill:#f9f,stroke:#333
 ```
-BEFORE:                                        AFTER:
+_4 hardcoded MCP connections_
 
-  App ──► catalog-service:8081                   App ──► Agent Gateway (single MCP endpoint)
-  App ──► orders-service:8082                              │
-  App ──► customers-service:8083                           ├──► catalog-service
-  App ──► notifications-service:8084                       ├──► orders-service
-                                                           ├──► customers-service
-  (4 hardcoded connections)                                └──► notifications-service
-                                                 (1 connection, gateway federates)
+**After:**
+```mermaid
+graph LR
+    App[support-service] -- "single MCP<br/>connection" --> AGW[Agent Gateway]
+    AGW --> Cat[catalog-service]
+    AGW --> Ord[orders-service]
+    AGW --> Cust[customers-service]
+    AGW --> Notif[notifications-service]
+    style AGW fill:#4af,stroke:#333,color:#fff
 ```
+_1 connection — gateway federates all MCP backends_
 
 ### What Changes
 
