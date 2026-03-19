@@ -688,6 +688,13 @@ helm uninstall enterprise-kgateway-crds -n kgateway-system
 kubectl delete namespace kgateway-system --ignore-not-found
 ```
 
+### Remove Solo/agentgateway CRDs
+
+```bash
+# Helm uninstall doesn't always remove all CRDs — clean up any leftovers
+kubectl get crds -o name | grep 'solo\|agentgateway' | xargs kubectl delete --ignore-not-found
+```
+
 ### Remove Gateway API CRDs
 
 ```bash
