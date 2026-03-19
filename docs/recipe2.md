@@ -561,10 +561,10 @@ curl -s -X POST http://${GATEWAY_IP}/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "What products do you have?", "customer_id": "CUST-001"}' | jq .
 
-# Check Agent Gateway metrics endpoint
-kubectl port-forward -n agentgateway-system svc/enterprise-agentgateway 9092:9092 &
+# Check Agent Gateway proxy metrics (port 15020 on the proxy pod, not the control plane)
+kubectl port-forward -n agentgateway-system deploy/agentgateway 15020:15020 &
 sleep 2
-curl -s localhost:9092/metrics | grep -i "agentgateway\|token\|llm" | head -20
+curl -s localhost:15020/stats/prometheus | grep "gen_ai" | head -20
 kill %1 2>/dev/null
 ```
 
