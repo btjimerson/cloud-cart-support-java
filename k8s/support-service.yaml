@@ -15,24 +15,16 @@ spec:
       labels:
         app: support-service
     spec:
-      imagePullSecrets:
-        - name: ghcr-secret
       containers:
         - name: support-service
-          image: ghcr.io/btjimerson/cloud-cart-support-java/support-service:step-6-mcp-federation
+          image: ghcr.io/btjimerson/cloud-cart-support-java/support-service:step-7-declarative-agents
           ports:
             - containerPort: 8080
           env:
-            - name: SPRING_AI_ANTHROPIC_BASE_URL
-              value: "http://agentgateway.agentgateway-system.svc:8080"
-            - name: CATALOG_SERVICE_URL
-              value: "http://catalog-service.cloud-cart-support.svc:8080"
-            - name: ORDERS_SERVICE_URL
-              value: "http://orders-service.cloud-cart-support.svc:8080"
-            - name: CUSTOMERS_SERVICE_URL
-              value: "http://customers-service.cloud-cart-support.svc:8080"
-            - name: NOTIFICATIONS_SERVICE_URL
-              value: "http://notifications-service.cloud-cart-support.svc:8080"
+            - name: KAGENT_A2A_URL
+              value: "http://kagent-controller.kagent.svc:8083"
+            - name: KAGENT_NAMESPACE
+              value: "kagent"
           livenessProbe:
             httpGet:
               path: /actuator/health
