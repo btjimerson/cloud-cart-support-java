@@ -19,6 +19,7 @@ spec:
         "*": Passthrough
       promptGuard:
         request:
+          # Reject harmful content
           - regex:
               action: Reject
               matches:
@@ -26,10 +27,18 @@ spec:
             response:
               message: "Your message was blocked because it contains inappropriate content."
               statusCode: 403
+          # Reject PII (SSN, phone numbers, emails)
+          - regex:
+              action: Reject
+              builtins:
+                - Ssn
+                - PhoneNumber
+                - Email
+            response:
+              message: "Your message was blocked because it contains personally identifiable information."
+              statusCode: 422
+          # Mask credit card numbers (replace with <CREDIT_CARD> in transit)
           - regex:
               action: Mask
               builtins:
                 - CreditCard
-                - Ssn
-                - Email
-                - PhoneNumber
