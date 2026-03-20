@@ -1,4 +1,4 @@
-apiVersion: agentgateway.solo.io/v1alpha1
+apiVersion: enterpriseagentgateway.solo.io/v1alpha1
 kind: EnterpriseAgentgatewayPolicy
 metadata:
   name: rate-limit-policy
