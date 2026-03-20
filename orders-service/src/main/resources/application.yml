@@ -11,6 +11,9 @@ spring:
   ai:
     mcp:
       server:
+        protocol: STREAMABLE
+        capabilities:
+          tool: true
         name: orders-service
         version: 0.1.0
 
