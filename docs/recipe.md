@@ -93,24 +93,62 @@ rm /tmp/agw-values.yaml
 > **Note:** Only install kagent if you plan to run Step 7 (Declarative Agents). Steps 0–6 do not require kagent.
 
 ```bash
-# Create namespace and JWT secret for kagent auth
-kubectl create namespace kagent --dry-run=client -o yaml | kubectl apply -f -
+# Install the management plane (UI, OIDC provider, telemetry, ClickHouse)
+cat <<VALS > /tmp/kagent-mgmt-values.yaml
+cluster: $(kubectl config current-context)
+products:
+  kagent:
+    enabled: true
+oidc:
+  issuer: ""
+VALS
+helm upgrade -i kagent-mgmt \
+  oci://us-docker.pkg.dev/solo-public/solo-enterprise-helm/charts/management \
+  -n kagent --create-namespace \
+  --version "${ENTERPRISE_KAGENT_VERSION}" \
+  --values /tmp/kagent-mgmt-values.yaml
+rm /tmp/kagent-mgmt-values.yaml
+
+# Wait for the management plane (includes the OIDC provider the controller needs)
+kubectl rollout status deploy/solo-enterprise-ui -n kagent --timeout=120s
+
+# Wait for the OIDC provider (Dex) inside solo-enterprise-ui to be fully serving
+# The pod may show Ready before the OIDC endpoint is available on port 5556
+echo "Waiting for OIDC provider to be ready..."
+until kubectl run oidc-check --rm -i --restart=Never --image=curlimages/curl -n kagent -- \
+  curl -sf http://solo-enterprise-ui.kagent.svc.cluster.local:5556/.well-known/openid-configuration >/dev/null 2>&1; do
+  sleep 5; echo "  ...waiting"
+done
+echo "OIDC provider ready"
+
+# Create JWT secret for kagent auth
 openssl genrsa -out /tmp/key.pem 2048
 kubectl create secret generic jwt -n kagent \
   --from-file=jwt=/tmp/key.pem --dry-run=client -o yaml | kubectl apply -f -
 rm /tmp/key.pem
 
-# Install CRDs
+# Install kagent CRDs
 helm upgrade -i kagent-crds \
   oci://us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts/kagent-enterprise-crds \
-  -n kagent --create-namespace \
+  -n kagent \
   --version "${ENTERPRISE_KAGENT_VERSION}"
 
-# Install control plane
+# Install kagent control plane (with UI and agentgateway proxy)
+cat <<VALS > /tmp/kagent-values.yaml
+proxy:
+  url: "http://agentgateway.agentgateway-system.svc:8080"
+ui:
+  enabled: true
+VALS
 helm upgrade -i kagent \
   oci://us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts/kagent-enterprise \
   -n kagent \
-  --version "${ENTERPRISE_KAGENT_VERSION}"
+  --version "${ENTERPRISE_KAGENT_VERSION}" \
+  --values /tmp/kagent-values.yaml
+rm /tmp/kagent-values.yaml
+
+# Verify all kagent pods are running
+kubectl get pods -n kagent
 ```
 
 ### 6. Verify infrastructure
@@ -938,6 +976,7 @@ kubectl delete modelconfig --all -n kagent --ignore-not-found
 kubectl delete remotemcpserver --all -n kagent --ignore-not-found
 helm uninstall kagent -n kagent || true
 helm uninstall kagent-crds -n kagent || true
+helm uninstall kagent-mgmt -n kagent || true
 kubectl get crds -o name | grep kagent | xargs kubectl delete --ignore-not-found
 kubectl delete namespace kagent --ignore-not-found
 
