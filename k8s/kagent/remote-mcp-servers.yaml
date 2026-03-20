@@ -5,10 +5,9 @@ metadata:
   namespace: kagent
 spec:
   description: Product catalog — search, details, availability, recommendations
-  protocol: SSE
-  url: http://catalog-service.cloud-cart-support.svc:8080/sse
+  protocol: STREAMABLE_HTTP
+  url: http://catalog-service.cloud-cart-support.svc:8080/mcp
   timeout: 30s
-  sseReadTimeout: 5m0s
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
@@ -17,10 +16,9 @@ metadata:
   namespace: kagent
 spec:
   description: Order management — status, tracking, cancellations
-  protocol: SSE
-  url: http://orders-service.cloud-cart-support.svc:8080/sse
+  protocol: STREAMABLE_HTTP
+  url: http://orders-service.cloud-cart-support.svc:8080/mcp
   timeout: 30s
-  sseReadTimeout: 5m0s
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
@@ -29,10 +27,9 @@ metadata:
   namespace: kagent
 spec:
   description: Customer accounts — profiles, history, notes
-  protocol: SSE
-  url: http://customers-service.cloud-cart-support.svc:8080/sse
+  protocol: STREAMABLE_HTTP
+  url: http://customers-service.cloud-cart-support.svc:8080/mcp
   timeout: 30s
-  sseReadTimeout: 5m0s
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
@@ -41,7 +38,6 @@ metadata:
   namespace: kagent
 spec:
   description: Notifications — email and SMS delivery
-  protocol: SSE
-  url: http://notifications-service.cloud-cart-support.svc:8080/sse
+  protocol: STREAMABLE_HTTP
+  url: http://notifications-service.cloud-cart-support.svc:8080/mcp
   timeout: 30s
-  sseReadTimeout: 5m0s
