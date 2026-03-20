@@ -35,6 +35,9 @@ kubectl apply -f "${SCRIPT_DIR}/support-service.yaml"
 # --- 3. Apply Agent Gateway CRDs (if any exist) ---
 if ls "${SCRIPT_DIR}"/agentgateway/*.yaml 1>/dev/null 2>&1; then
   echo "==> Applying Agent Gateway CRDs..."
+  # Clean up stale resources from previous steps that may conflict
+  # (e.g., ai-routes-policy was merged into prompt-guard-policy in step 2)
+  kubectl delete enterpriseagentgatewaypolicy ai-routes-policy -n agentgateway-system --ignore-not-found 2>/dev/null || true
   kubectl apply -f "${SCRIPT_DIR}/agentgateway/" --recursive
 fi
 
