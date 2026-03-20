@@ -6,14 +6,13 @@ metadata:
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
-      kind: HTTPRoute
-      name: anthropic-route
-  observability:
-    metrics:
-      enabled: true
-      prometheus:
-        enabled: true
-    tracing:
-      enabled: true
-      otlp:
-        endpoint: "http://otel-collector.observability.svc:4317"
+      kind: Gateway
+      name: agentgateway
+  frontend:
+    accessLog:
+      attributes:
+        add:
+          - name: gen_ai.request.model
+            expression: 'request.headers["x-model"]'
+          - name: gen_ai.client
+            expression: 'request.headers["x-client-id"]'
