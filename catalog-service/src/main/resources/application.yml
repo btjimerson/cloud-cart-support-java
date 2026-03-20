@@ -11,7 +11,7 @@ spring:
   ai:
     mcp:
       server:
-        protocol: SSE
+        protocol: STREAMABLE
         capabilities:
           tool: true
         name: catalog-service
