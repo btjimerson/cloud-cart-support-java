@@ -16,6 +16,7 @@ kubectl delete remotemcpserver --all -n kagent --ignore-not-found 2>/dev/null ||
 echo "==> Uninstalling Enterprise Kagent..."
 helm uninstall kagent -n kagent 2>/dev/null || true
 helm uninstall kagent-crds -n kagent 2>/dev/null || true
+helm uninstall kagent-mgmt -n kagent 2>/dev/null || true
 kubectl get crds -o name | grep kagent | xargs kubectl delete --ignore-not-found 2>/dev/null || true
 kubectl delete namespace kagent --ignore-not-found --wait=false
 
