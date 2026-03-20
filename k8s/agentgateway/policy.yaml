@@ -10,6 +10,13 @@ spec:
       name: anthropic-route
   backend:
     ai:
+      # Routes must be in the same policy as promptGuard to avoid silent
+      # policy conflict (see agentgateway-enterprise#149, #267)
+      routes:
+        "/v1/chat/completions": Completions
+        "/v1/messages": Messages
+        "/v1/models": Models
+        "*": Passthrough
       promptGuard:
         request:
           - regex:
