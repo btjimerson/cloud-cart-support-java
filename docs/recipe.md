@@ -828,7 +828,7 @@ curl -s -X POST http://$GATEWAY_IP/chat \
 kubectl get agentgatewaybackend -n agentgateway-system
 
 # Show the single gateway connection in app config
-grep -A10 mcp support-service/src/main/resources/application.yml
+grep -A2 mcp support-service/src/main/resources/application.yml
 ```
 
 ---
