@@ -486,13 +486,13 @@ curl -sv -X POST http://$AGW_IP:8080/v1/messages \
 # Body: "Your message was blocked because it contains inappropriate content."
 ```
 
-**PII blocking** — credit card number triggers builtin detector:
+**PII blocking** — social security number triggers builtin detector:
 
 ```bash
 curl -sv -X POST http://$AGW_IP:8080/v1/messages \
   -H 'Content-Type: application/json' \
-  -d '{"model":"claude-sonnet-4-5-20250929","max_tokens":50,"messages":[{"role":"user","content":"Store my card number 4111-1111-1111-1111 for next time"}]}'
-# Expected: PII is masked before reaching the LLM
+  -d '{"model":"claude-sonnet-4-5-20250929","max_tokens":50,"messages":[{"role":"user","content":"My social security number is 123-45-6789"}]}'
+# Expected: HTTP 422 — "Your message was blocked because it contains personally identifiable information."
 ```
 
 **Normal passthrough** — benign message passes through:
