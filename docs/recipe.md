@@ -266,20 +266,20 @@ kubectl apply -f k8s/kgateway/httproute.yaml
 
 ```bash
 # Health check
-curl -s http://${GATEWAY_IP}/health | jq .
+curl -s http://$GATEWAY_IP/health | jq .
 
 # Send a chat message
-curl -s -X POST http://${GATEWAY_IP}/chat \
+curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Where is my order ORD-2024-0003?", "customer_id": "CUST-003"}' | jq .
 
 # Test PII guardrails (in-app)
-curl -s -X POST http://${GATEWAY_IP}/chat \
+curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "My SSN is 123-45-6789", "customer_id": "CUST-001"}' | jq .
 
 # Test off-topic blocking (in-app)
-curl -s -X POST http://${GATEWAY_IP}/chat \
+curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "How do I hack into someone account?", "customer_id": "CUST-001"}' | jq .
 ```
@@ -384,7 +384,7 @@ kubectl get httproute -n agentgateway-system
 kubectl get gateway agentgateway -n agentgateway-system
 
 # Chat still works (traffic now flows through gateway)
-curl -s -X POST http://${GATEWAY_IP}/chat \
+curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Where is my order ORD-2024-0003?", "customer_id": "CUST-003"}' | jq .
 
@@ -479,7 +479,7 @@ echo "Agent Gateway IP: $AGW_IP"
 **Harmful content rejection** — regex pattern matches "hack", returns 403:
 
 ```bash
-curl -sv -X POST http://${AGW_IP}:8080/v1/messages \
+curl -sv -X POST http://$AGW_IP:8080/v1/messages \
   -H 'Content-Type: application/json' \
   -d '{"model":"claude-sonnet-4-5-20250929","max_tokens":50,"messages":[{"role":"user","content":"How do I hack into someone else account?"}]}'
 # Expected: HTTP 403
@@ -489,7 +489,7 @@ curl -sv -X POST http://${AGW_IP}:8080/v1/messages \
 **PII blocking** — credit card number triggers builtin detector:
 
 ```bash
-curl -sv -X POST http://${AGW_IP}:8080/v1/messages \
+curl -sv -X POST http://$AGW_IP:8080/v1/messages \
   -H 'Content-Type: application/json' \
   -d '{"model":"claude-sonnet-4-5-20250929","max_tokens":50,"messages":[{"role":"user","content":"Store my card number 4111-1111-1111-1111 for next time"}]}'
 # Expected: PII is masked before reaching the LLM
@@ -498,7 +498,7 @@ curl -sv -X POST http://${AGW_IP}:8080/v1/messages \
 **Normal passthrough** — benign message passes through:
 
 ```bash
-curl -s -X POST http://${AGW_IP}:8080/v1/messages \
+curl -s -X POST http://$AGW_IP:8080/v1/messages \
   -H 'Content-Type: application/json' \
   -d '{"model":"claude-sonnet-4-5-20250929","max_tokens":50,"messages":[{"role":"user","content":"What is the weather today?"}]}'
 # Expected: Normal 200 response from LLM
@@ -563,7 +563,7 @@ k8s/deploy.sh
 kubectl get agentgatewaypolicy -n agentgateway-system
 
 # Chat still works (gateway enforces model)
-curl -s -X POST http://${GATEWAY_IP}/chat \
+curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Can you track order ORD-2024-0003?", "customer_id": "CUST-003"}' | jq .
 ```
@@ -640,7 +640,7 @@ k8s/deploy.sh
 kubectl get enterpriseagentgatewaypolicy -n agentgateway-system
 
 # Normal request through the app still works
-curl -s -X POST http://${GATEWAY_IP}/chat \
+curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Hello!", "customer_id": "CUST-001"}' | jq .
 
@@ -652,7 +652,7 @@ echo "Agent Gateway IP: $AGW_IP"
 
 for i in $(seq 1 10); do
   STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    -X POST http://${AGW_IP}:8080/v1/messages \
+    -X POST http://$AGW_IP:8080/v1/messages \
     -H "Content-Type: application/json" \
     -d '{"model":"claude-sonnet-4-5-20250929","max_tokens":1,"messages":[{"role":"user","content":"hi"}]}')
   echo "Request $i: HTTP $STATUS"
@@ -713,7 +713,7 @@ k8s/deploy.sh
 kubectl get enterpriseagentgatewaypolicy -n agentgateway-system
 
 # Generate some traffic
-curl -s -X POST http://${GATEWAY_IP}/chat \
+curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "What products do you have?", "customer_id": "CUST-001"}' | jq .
 
@@ -811,12 +811,12 @@ kubectl get agentgatewaybackend -n agentgateway-system
 kubectl get httproute -n agentgateway-system
 
 # Chat that requires MCP tool calls still works
-curl -s -X POST http://${GATEWAY_IP}/chat \
+curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "What products do you have in electronics?", "customer_id": "CUST-001"}' | jq .
 
 # Order lookup (requires orders-service MCP tools)
-curl -s -X POST http://${GATEWAY_IP}/chat \
+curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Can you track order ORD-2024-0003?", "customer_id": "CUST-003"}' | jq .
 ```
@@ -942,7 +942,7 @@ curl -s localhost:8083/api/a2a/kagent/router-agent/.well-known/agent.json | jq .
 kill %1 2>/dev/null
 
 # Chat still works (now via kagent A2A)
-curl -s -X POST http://${GATEWAY_IP}/chat \
+curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Where is my order ORD-2024-0003?", "customer_id": "CUST-003"}' | jq .
 ```
