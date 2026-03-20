@@ -39,6 +39,8 @@ spec:
     a2aConfig:
       skills:
         - id: order-management
+          name: Order Management
+          tags: ["orders", "tracking", "shipping"]
           description: Order tracking, status, cancellations, and shipping
           examples:
             - "Where is my order ORD-2024-0003?"
@@ -81,6 +83,8 @@ spec:
     a2aConfig:
       skills:
         - id: product-search
+          name: Product Search
+          tags: ["products", "catalog", "recommendations"]
           description: Product search, recommendations, and availability
           examples:
             - "What headphones do you have?"
@@ -135,6 +139,8 @@ spec:
     a2aConfig:
       skills:
         - id: returns-refunds
+          name: Returns and Refunds
+          tags: ["returns", "refunds", "exchanges"]
           description: Return requests, refunds, and exchange processing
           examples:
             - "I want to return this item"
@@ -187,6 +193,8 @@ spec:
     a2aConfig:
       skills:
         - id: complaint-resolution
+          name: Complaint Resolution
+          tags: ["complaints", "escalations", "support"]
           description: Complaint handling, escalations, and service issue resolution
           examples:
             - "This is unacceptable service!"
@@ -235,6 +243,8 @@ spec:
     a2aConfig:
       skills:
         - id: customer-support
+          name: Customer Support
+          tags: ["support", "routing", "customer-service"]
           description: General customer support routing and assistance
           examples:
             - "Where is my order?"
