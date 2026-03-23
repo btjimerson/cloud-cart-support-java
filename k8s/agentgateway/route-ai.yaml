@@ -5,9 +5,9 @@ metadata:
   namespace: agentgateway-system
 spec:
   parentRefs:
-    - name: enterprise-agentgateway
+    - name: agentgateway
   rules:
     - backendRefs:
-        - group: agentgateway.solo.io
+        - group: agentgateway.dev
           kind: AgentgatewayBackend
           name: anthropic
