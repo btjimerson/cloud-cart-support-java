@@ -50,9 +50,15 @@ public class A2AClient {
         taskMessage.put("role", "user");
         taskMessage.put("parts", List.of(Map.of("kind", "text", "text", message)));
 
+        Map<String, Object> params = new LinkedHashMap<>();
+        params.put("id", contextId != null ? contextId : UUID.randomUUID().toString());
+        params.put("message", taskMessage);
+
         Map<String, Object> requestBody = new LinkedHashMap<>();
-        requestBody.put("id", contextId != null ? contextId : UUID.randomUUID().toString());
-        requestBody.put("message", taskMessage);
+        requestBody.put("jsonrpc", "2.0");
+        requestBody.put("id", UUID.randomUUID().toString());
+        requestBody.put("method", "tasks/send");
+        requestBody.put("params", params);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -79,27 +85,24 @@ public class A2AClient {
         }
 
         try {
-            // A2A response has result.history[] with messages
-            Map<String, Object> result = (Map<String, Object>) body.get("result");
-            if (result == null) {
-                // Try status for error
-                Map<String, Object> status = (Map<String, Object>) body.get("status");
-                if (status != null) {
-                    Map<String, Object> statusMessage = (Map<String, Object>) status.get("message");
-                    if (statusMessage != null) {
-                        List<Map<String, Object>> parts = (List<Map<String, Object>>) statusMessage.get("parts");
-                        if (parts != null && !parts.isEmpty()) {
-                            String text = (String) parts.get(0).get("text");
-                            return new AgentResponse(text != null ? text : "Agent completed.", agentName);
-                        }
-                    }
-                }
-                return new AgentResponse("Agent completed with no message.", agentName);
+            // Check for JSON-RPC error
+            if (body.containsKey("error")) {
+                Map<String, Object> error = (Map<String, Object>) body.get("error");
+                String message = error != null ? String.valueOf(error.get("message")) : "Unknown error";
+                log.error(String.format("A2A JSON-RPC error from '%s': %s", agentName, message));
+                return new AgentResponse("Agent error: " + message, agentName);
             }
 
-            List<Map<String, Object>> history = (List<Map<String, Object>>) result.get("history");
+            // Unwrap JSON-RPC envelope: body.result is the A2A task object
+            Map<String, Object> task = (Map<String, Object>) body.get("result");
+            if (task == null) {
+                return new AgentResponse("Agent completed with no result.", agentName);
+            }
+
+            // Try history[] for conversation messages
+            List<Map<String, Object>> history = (List<Map<String, Object>>) task.get("history");
             if (history != null && !history.isEmpty()) {
-                // Get the last assistant message
+                // Get the last agent message
                 for (int i = history.size() - 1; i >= 0; i--) {
                     Map<String, Object> msg = history.get(i);
                     if ("agent".equals(msg.get("role"))) {
@@ -114,8 +117,23 @@ public class A2AClient {
                 }
             }
 
+            // Try status.message for final status
+            Map<String, Object> status = (Map<String, Object>) task.get("status");
+            if (status != null) {
+                Map<String, Object> statusMessage = (Map<String, Object>) status.get("message");
+                if (statusMessage != null) {
+                    List<Map<String, Object>> parts = (List<Map<String, Object>>) statusMessage.get("parts");
+                    if (parts != null && !parts.isEmpty()) {
+                        String text = (String) parts.get(0).get("text");
+                        if (text != null && !text.isBlank()) {
+                            return new AgentResponse(text, agentName);
+                        }
+                    }
+                }
+            }
+
             // Fallback: try artifacts
-            List<Map<String, Object>> artifacts = (List<Map<String, Object>>) result.get("artifacts");
+            List<Map<String, Object>> artifacts = (List<Map<String, Object>>) task.get("artifacts");
             if (artifacts != null && !artifacts.isEmpty()) {
                 List<Map<String, Object>> parts = (List<Map<String, Object>>) artifacts.get(0).get("parts");
                 if (parts != null && !parts.isEmpty()) {

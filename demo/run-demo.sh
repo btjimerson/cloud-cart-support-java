@@ -615,9 +615,21 @@ print(base64.b64encode(json.dumps(d).encode()).decode())
     done
   fi
 
-  run_test "Chat via A2A" curl -sf -X POST "http://$GATEWAY_IP/chat" \
+  label "Testing chat via A2A"
+  local chat_response
+  chat_response=$(curl -s -X POST "http://$GATEWAY_IP/chat" \
     -H "Content-Type: application/json" \
-    -d '{"message": "Where is my order ORD-2024-0003?", "customer_id": "CUST-003"}'
+    -d '{"message": "Where is my order ORD-2024-0003?", "customer_id": "CUST-003"}' 2>&1)
+  local chat_code=$?
+  if [ $chat_code -ne 0 ]; then
+    fail "Chat request failed (curl exit code $chat_code)"
+  elif echo "$chat_response" | grep -qi "error\|apologize\|encountered"; then
+    fail "Chat returned error response:"
+    echo "$chat_response" | python3 -m json.tool 2>/dev/null || echo "$chat_response"
+  else
+    success "Chat via A2A succeeded"
+    echo "$chat_response" | python3 -m json.tool 2>/dev/null || echo "$chat_response"
+  fi
 
   label "Demo talking points"
   info "3,400 lines of Java replaced by ~150 lines of code + YAML CRDs."
