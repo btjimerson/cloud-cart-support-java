@@ -35,10 +35,25 @@ kubectl apply -f "${SCRIPT_DIR}/support-service.yaml"
 # --- 3. Apply Agent Gateway CRDs (if any exist) ---
 if ls "${SCRIPT_DIR}"/agentgateway/*.yaml 1>/dev/null 2>&1; then
   echo "==> Applying Agent Gateway CRDs..."
+  # Clean up stale resources from previous steps that may conflict
+  # (e.g., ai-routes-policy was merged into prompt-guard-policy in step 2)
+  kubectl delete enterpriseagentgatewaypolicy ai-routes-policy -n agentgateway-system --ignore-not-found 2>/dev/null || true
   kubectl apply -f "${SCRIPT_DIR}/agentgateway/" --recursive
 fi
 
-# --- 4. Wait for rollouts ---
+# --- 4. Apply kagent CRDs (if any exist) ---
+if ls "${SCRIPT_DIR}"/kagent/*.yaml 1>/dev/null 2>&1; then
+  echo "==> Applying kagent CRDs..."
+  kubectl create namespace kagent --dry-run=client -o yaml | kubectl apply -f -
+  # Create a dummy API key secret for kagent ModelConfig (gateway handles real auth)
+  kubectl create secret generic kagent-llm-key \
+    -n kagent \
+    --from-literal=API_KEY="not-used-gateway-handles-auth" \
+    --dry-run=client -o yaml | kubectl apply -f -
+  kubectl apply -f "${SCRIPT_DIR}/kagent/" --recursive
+fi
+
+# --- 5. Wait for rollouts ---
 echo "==> Waiting for deployments to become ready..."
 kubectl rollout status deployment/catalog-service -n cloud-cart-support --timeout=120s
 kubectl rollout status deployment/orders-service -n cloud-cart-support --timeout=120s
