@@ -112,6 +112,11 @@ setup_env() {
   fi
   export ENTERPRISE_AGENTGATEWAY_LICENSE_KEY
 
+  if [ -z "${OPENAI_API_KEY:-}" ]; then
+    read -rsp "Enter OPENAI_API_KEY (required by kagent): " OPENAI_API_KEY; echo
+  fi
+  export OPENAI_API_KEY
+
   export ENTERPRISE_AGENTGATEWAY_VERSION ENTERPRISE_KGATEWAY_VERSION ENTERPRISE_KAGENT_VERSION
 
   success "Environment configured"
@@ -247,6 +252,10 @@ proxy:
   url: "http://agentgateway.agentgateway-system.svc:8080"
 ui:
   enabled: true
+providers:
+  default: openAI
+  openAI:
+    apiKey: ${OPENAI_API_KEY}
 VALS
   local license_args=()
   if [ -n "${ENTERPRISE_KAGENT_LICENSE_KEY:-}" ]; then

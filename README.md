@@ -419,6 +419,7 @@ An interactive script runs through the full Enterprise Agent Gateway demo (Steps
 - Helm 3.x, `jq`, `curl`, `git`
 - License keys for Solo Enterprise for kgateway, Agent Gateway, and kagent (Step 7)
 - An Anthropic API key
+- An OpenAI API key (required by kagent default model config)
 
 ### Running the demo
 
