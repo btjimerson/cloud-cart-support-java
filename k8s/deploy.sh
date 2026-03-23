@@ -44,6 +44,7 @@ fi
 # --- 4. Apply kagent CRDs (if any exist) ---
 if ls "${SCRIPT_DIR}"/kagent/*.yaml 1>/dev/null 2>&1; then
   echo "==> Applying kagent CRDs..."
+  kubectl create namespace kagent --dry-run=client -o yaml | kubectl apply -f -
   # Create a dummy API key secret for kagent ModelConfig (gateway handles real auth)
   kubectl create secret generic kagent-llm-key \
     -n kagent \
