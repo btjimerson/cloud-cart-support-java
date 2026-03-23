@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: enterprise-agentgateway
+  name: agentgateway
   namespace: agentgateway-system
 spec:
   gatewayClassName: enterprise-agentgateway
