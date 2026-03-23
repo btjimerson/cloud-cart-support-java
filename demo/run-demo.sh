@@ -194,15 +194,6 @@ VALS
 install_kagent() {
   banner "Installing kagent (for Step 7)"
 
-  if [ -z "${ENTERPRISE_KAGENT_LICENSE_KEY:-}" ]; then
-    read -rsp "Enter ENTERPRISE_KAGENT_LICENSE_KEY (leave blank to skip): " ENTERPRISE_KAGENT_LICENSE_KEY; echo
-    if [ -z "$ENTERPRISE_KAGENT_LICENSE_KEY" ]; then
-      info "Skipping kagent install (no license key)"
-      return
-    fi
-  fi
-  export ENTERPRISE_KAGENT_LICENSE_KEY
-
   label "Management plane"
   cat <<VALS > /tmp/kagent-mgmt-values.yaml
 cluster: $(kubectl config current-context)
