@@ -615,6 +615,22 @@ print(base64.b64encode(json.dumps(d).encode()).decode())
     done
   fi
 
+  label "Waiting for kagent controller to be ready"
+  max_wait=60 elapsed=0
+  while [ $elapsed -lt $max_wait ]; do
+    if kubectl exec -n cloud-cart-support deploy/support-service -- \
+        curl -sf -o /dev/null "http://kagent-controller.kagent.svc:8083/health" 2>/dev/null; then
+      success "kagent controller is ready"
+      break
+    fi
+    echo -e "  ${DIM}...waiting (${elapsed}s)${RESET}"
+    sleep 5
+    elapsed=$((elapsed + 5))
+  done
+  if [ $elapsed -ge $max_wait ]; then
+    fail "kagent controller not ready after ${max_wait}s"
+  fi
+
   label "Testing chat via A2A"
   local chat_response
   chat_response=$(curl -s -X POST "http://$GATEWAY_IP/chat" \
