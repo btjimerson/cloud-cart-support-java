@@ -6,7 +6,8 @@ metadata:
 spec:
   ai:
     provider:
-      anthropic: {}
+      anthropic:
+        model: claude-sonnet-4-5-20250929
   policies:
     auth:
       secretRef:
