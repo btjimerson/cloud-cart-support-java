@@ -159,7 +159,7 @@ git tag v0.1.0 && git push origin v0.1.0
 # Deploy namespace, secret, and all services
 k8s/deploy.sh
 
-# Access the UI
+# Access the UI via port-forward (or use the external IP from the Gateway)
 kubectl port-forward svc/support-service -n cloud-cart-support 8080:8080
 ```
 
@@ -207,9 +207,18 @@ k8s/
 │   ├── gateway.yaml                # Gateway (cloud-cart-gateway, port 80)
 │   ├── httproute.yaml              # HTTPRoute (/ → support-service:8080)
 │   ├── httplistenerpolicy.yaml     # HTTPListenerPolicy (WebSocket upgrade)
-│   └── apply.sh                    # Apply all kgateway resources
+│   └── apply.sh                   # Apply all kgateway resources
 └── agentgateway/
-    └── install.sh                  # Helm install (Gateway API CRDs + Enterprise AG)
+    ├── install.sh                  # Helm install (Gateway API CRDs + Enterprise AG)
+    ├── gateway.yaml                # Enterprise Agent Gateway listener
+    ├── backend-anthropic.yaml      # AgentgatewayBackend for Anthropic
+    ├── route-ai.yaml               # HTTPRoute for AI traffic
+    ├── policy.yaml                 # EnterpriseAgentgatewayPolicy (prompt guards, PII masking)
+    ├── model-policy.yaml           # AgentgatewayPolicy (model defaults and overrides)
+    ├── rate-limit-policy.yaml      # EnterpriseAgentgatewayPolicy (rate limiting)
+    ├── observability-policy.yaml   # EnterpriseAgentgatewayPolicy (telemetry and tracing)
+    ├── backends-mcp.yaml           # AgentgatewayBackend resources for MCP servers
+    └── route-mcp.yaml              # HTTPRoute for MCP traffic
 ```
 
 For the progressive Agent Gateway demo recipe, see [docs/recipe.md](docs/recipe.md).
