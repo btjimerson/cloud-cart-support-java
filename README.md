@@ -13,6 +13,7 @@ A distributed multi-agent AI customer service system built with Spring Boot, Spr
 - [Kubernetes](#kubernetes)
 - [API](#api)
 - [Demo Script](#demo-script)
+- [Automated Demo Runner](#automated-demo-runner)
 - [Maintainers](#maintainers)
 - [License](#license)
 
@@ -407,6 +408,69 @@ curl -s -X POST http://localhost:8080/chat \
 | CUST-008 Robert Anderson | 450 | Bronze |
 
 **Product categories:** electronics, kitchen, sports, beauty, toys, home, pets, office, automotive, tools (50 products total)
+
+## Automated Demo Runner
+
+An interactive script runs through the full Enterprise Agent Gateway demo (Steps 0-7) automatically. It deploys each step, runs verification tests, and waits for you to press Enter before continuing.
+
+### Prerequisites
+
+- A clean Kubernetes cluster with `kubectl` configured
+- Helm 3.x, `jq`, `curl`, `git`
+- License keys for Solo Enterprise for kgateway, Agent Gateway, and kagent (Step 7)
+- An Anthropic API key
+
+### Running the demo
+
+```bash
+git checkout main
+./demo/run-demo.sh
+```
+
+The script will:
+
+1. Source `.env` if present, then prompt for any missing API keys and license keys
+2. Use default versions if not set (`kgateway 2.1.2`, `Agent Gateway 2.2.0-beta.4`, `kagent 0.3.9`)
+3. Install infrastructure (Gateway API CRDs, kgateway, Agent Gateway) if not already present
+4. Run each step: check out the branch, deploy, run tests, wait for Enter
+
+### Options
+
+Start from a specific step (e.g., Step 3):
+
+```bash
+git checkout main
+./demo/run-demo.sh 3
+```
+
+Skip infrastructure install if already set up:
+
+```bash
+SKIP_INFRA=true ./demo/run-demo.sh
+```
+
+Pre-set environment variables to skip prompts:
+
+```bash
+cp .env.example .env
+# Fill in your keys in .env
+./demo/run-demo.sh
+```
+
+### Steps
+
+| Step | Branch | What Changes |
+|------|--------|-------------|
+| 0 | `main` | Baseline -- all AI plumbing in application code |
+| 1 | `demo/step-1-api-keys` | API key management moves to Agent Gateway |
+| 2 | `demo/step-2-prompt-guards` | PII detection and content filtering via gateway policy |
+| 3 | `demo/step-3-model-config` | Model name and token limits managed by gateway |
+| 4 | `demo/step-4-rate-limiting` | Rate limiting via gateway policy |
+| 5 | `demo/step-5-observability` | Prometheus metrics and tracing (zero code changes) |
+| 6 | `demo/step-6-mcp-federation` | 4 MCP connections consolidated behind gateway |
+| 7 | `demo/step-7-declarative-agents` | Java agents replaced with kagent Kubernetes CRDs |
+
+For the full recipe with architecture diagrams and talking points, see [docs/recipe.md](docs/recipe.md).
 
 ## Maintainers
 
