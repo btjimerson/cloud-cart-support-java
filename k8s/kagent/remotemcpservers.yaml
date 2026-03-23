@@ -4,9 +4,8 @@ metadata:
   name: catalog-service
   namespace: kagent
 spec:
-  transport:
-    sse:
-      url: http://catalog-service.cloud-cart-support.svc.cluster.local:8080/sse
+  url: http://catalog-service.cloud-cart-support.svc.cluster.local:8080/sse
+  protocol: SSE
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
@@ -14,9 +13,8 @@ metadata:
   name: orders-service
   namespace: kagent
 spec:
-  transport:
-    sse:
-      url: http://orders-service.cloud-cart-support.svc.cluster.local:8080/sse
+  url: http://orders-service.cloud-cart-support.svc.cluster.local:8080/sse
+  protocol: SSE
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
@@ -24,9 +22,8 @@ metadata:
   name: customers-service
   namespace: kagent
 spec:
-  transport:
-    sse:
-      url: http://customers-service.cloud-cart-support.svc.cluster.local:8080/sse
+  url: http://customers-service.cloud-cart-support.svc.cluster.local:8080/sse
+  protocol: SSE
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
@@ -34,6 +31,5 @@ metadata:
   name: notifications-service
   namespace: kagent
 spec:
-  transport:
-    sse:
-      url: http://notifications-service.cloud-cart-support.svc.cluster.local:8080/sse
+  url: http://notifications-service.cloud-cart-support.svc.cluster.local:8080/sse
+  protocol: SSE
