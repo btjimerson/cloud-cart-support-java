@@ -40,9 +40,16 @@ kind: Service
 metadata:
   name: orders-service
   namespace: cloud-cart-support
+  labels:
+    kagent.dev/mcp-service: "true"
+  annotations:
+    kagent.dev/mcp-service-port: "8080"
+    kagent.dev/mcp-service-protocol: SSE
+    kagent.dev/mcp-service-path: /sse
 spec:
   selector:
     app: orders-service
   ports:
-    - port: 8080
+    - appProtocol: mcp
+      port: 8080
       targetPort: 8080
