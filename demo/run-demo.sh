@@ -30,7 +30,11 @@ label()   { echo -e "\n${BOLD}▸ $*${RESET}"; }
 
 wait_for_user() {
   echo ""
-  echo -e "${YELLOW}─── Press Enter to continue to the next step ───${RESET}"
+  if [ -n "${1:-}" ]; then
+    echo -e "${YELLOW}─── Next: $1. Press Enter to continue ───${RESET}"
+  else
+    echo -e "${YELLOW}─── Press Enter to continue ───${RESET}"
+  fi
   read -r
 }
 
@@ -302,7 +306,7 @@ step_0() {
   run_show "API key in deployment env" kubectl get deploy support-service -n cloud-cart-support \
     -o jsonpath='{.spec.template.spec.containers[0].env[*].name}'
 
-  wait_for_user
+  wait_for_user "Step 1 - API Key Management"
 }
 
 step_1() {
@@ -335,7 +339,7 @@ step_1() {
     -o jsonpath='{.spec.template.spec.containers[0].env[*].name}'
   run_show "Key in gateway namespace" kubectl get secret anthropic-api-key -n agentgateway-system
 
-  wait_for_user
+  wait_for_user "Step 2 - Prompt Guards"
 }
 
 step_2() {
@@ -381,7 +385,7 @@ step_2() {
   info "82 lines of Java replaced by a YAML policy."
   info "New PII types or content rules are kubectl apply, not a code deploy."
 
-  wait_for_user
+  wait_for_user "Step 3 - Model Configuration"
 }
 
 step_3() {
@@ -407,7 +411,7 @@ step_3() {
   run_show "Model set on backend" kubectl get agentgatewaybackend anthropic -n agentgateway-system \
     -o jsonpath='{.spec.ai.provider.anthropic.model}'
 
-  wait_for_user
+  wait_for_user "Step 4 - Rate Limiting"
 }
 
 step_4() {
@@ -447,7 +451,7 @@ step_4() {
   info "53 lines of Java + tests replaced by a YAML policy."
   info "Rate limits work across replicas and can be changed without code deploys."
 
-  wait_for_user
+  wait_for_user "Step 5 - Observability"
 }
 
 step_5() {
@@ -478,7 +482,7 @@ step_5() {
   info "Zero code changes. Gateway emits LLM-aware metrics for every request."
   run_show "No app code changes" git diff demo/step-4-rate-limiting -- support-service/src/
 
-  wait_for_user
+  wait_for_user "Step 6 - MCP Federation"
 }
 
 step_6() {
@@ -506,7 +510,7 @@ step_6() {
   info "App has a single MCP connection. Adding a new MCP server is kubectl apply."
   run_show "Federated MCP backends" kubectl get agentgatewaybackend -n agentgateway-system
 
-  wait_for_user
+  wait_for_user "Step 7 - Declarative Agents"
 }
 
 step_7() {
@@ -653,7 +657,7 @@ print(base64.b64encode(json.dumps(d).encode()).decode())
   run_show "Agents" kubectl get agents -n kagent
   run_show "Code reduction" git diff --stat demo/step-6-mcp-federation
 
-  wait_for_user
+  wait_for_user "Step 8 - Cleanup"
 }
 
 # ---------------------------------------------------------------------------
