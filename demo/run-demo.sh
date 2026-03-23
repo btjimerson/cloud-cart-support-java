@@ -112,11 +112,6 @@ setup_env() {
   fi
   export ENTERPRISE_AGENTGATEWAY_LICENSE_KEY
 
-  if [ -z "${OPENAI_API_KEY:-}" ]; then
-    read -rsp "Enter OPENAI_API_KEY (required by kagent default model config): " OPENAI_API_KEY; echo
-  fi
-  export OPENAI_API_KEY
-
   export ENTERPRISE_AGENTGATEWAY_VERSION ENTERPRISE_KGATEWAY_VERSION ENTERPRISE_KAGENT_VERSION
 
   success "Environment configured"
@@ -207,14 +202,6 @@ install_kagent() {
     read -rsp "Enter ENTERPRISE_KAGENT_LICENSE_KEY (leave blank for versions that don't require one): " ENTERPRISE_KAGENT_LICENSE_KEY; echo
   fi
   export ENTERPRISE_KAGENT_LICENSE_KEY
-
-  kubectl create namespace kagent --dry-run=client -o yaml | kubectl apply -f -
-
-  label "OpenAI API key secret (required by kagent default model config)"
-  kubectl create secret generic kagent-openai \
-    -n kagent \
-    --from-literal=OPENAI_API_KEY="${OPENAI_API_KEY}" \
-    --dry-run=client -o yaml | kubectl apply -f -
 
   label "Management plane"
   cat <<VALS > /tmp/kagent-mgmt-values.yaml
