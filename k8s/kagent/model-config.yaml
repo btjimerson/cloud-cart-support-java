@@ -9,4 +9,4 @@ spec:
   apiKeySecret: kagent-llm-key
   apiKeySecretKey: API_KEY
   openAI:
-    baseUrl: "http://agentgateway.agentgateway-system.svc:8080"
+    baseUrl: "http://agentgateway.agentgateway-system.svc:8080/v1"

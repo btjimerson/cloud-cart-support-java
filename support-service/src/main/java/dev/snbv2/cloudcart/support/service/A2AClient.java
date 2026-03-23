@@ -57,7 +57,7 @@ public class A2AClient {
         Map<String, Object> requestBody = new LinkedHashMap<>();
         requestBody.put("jsonrpc", "2.0");
         requestBody.put("id", UUID.randomUUID().toString());
-        requestBody.put("method", "tasks/send");
+        requestBody.put("method", "message/send");
         requestBody.put("params", params);
 
         HttpHeaders headers = new HttpHeaders();
