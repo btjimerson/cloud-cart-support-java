@@ -134,6 +134,7 @@ helm upgrade -i kagent-crds \
   --version "${ENTERPRISE_KAGENT_VERSION}"
 
 # Install kagent control plane (with UI and agentgateway proxy)
+# Note: kagent 0.3.10+ requires a license key via licensing.licenseKey
 cat <<VALS > /tmp/kagent-values.yaml
 proxy:
   url: "http://agentgateway.agentgateway-system.svc:8080"
@@ -144,7 +145,8 @@ helm upgrade -i kagent \
   oci://us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts/kagent-enterprise \
   -n kagent \
   --version "${ENTERPRISE_KAGENT_VERSION}" \
-  --values /tmp/kagent-values.yaml
+  --values /tmp/kagent-values.yaml \
+  ${ENTERPRISE_KAGENT_LICENSE_KEY:+--set licensing.licenseKey="${ENTERPRISE_KAGENT_LICENSE_KEY}"}
 rm /tmp/kagent-values.yaml
 
 # Verify all kagent pods are running
@@ -908,7 +910,7 @@ _Agent orchestration is Kubernetes CRDs managed by kagent_
 - `support-service.yaml` — new image tag, env vars `KAGENT_A2A_URL` and `KAGENT_NAMESPACE`
 
 **CRDs added (in `k8s/kagent/`):**
-- `model-config.yaml` — ModelConfig pointing to agentgateway (`provider: OpenAI`, `baseUrl` = gateway service)
+- `model-config.yaml` — ModelConfig pointing to agentgateway (`provider: OpenAI`, `baseUrl` = gateway service URL with `/v1` suffix, e.g. `http://agentgateway.agentgateway-system.svc:8080/v1`)
 - `remote-mcp-servers.yaml` — 4 RemoteMCPServer resources (catalog, orders, customers, notifications)
 - `agents.yaml` — 5 Agent CRs: router-agent (with agent-as-tool references) + 4 specialist agents (with MCP tool references and system prompts)
 
@@ -923,6 +925,45 @@ git checkout demo/step-7-declarative-agents
 k8s/deploy.sh
 ```
 
+### kagent 0.3.9 workaround: `tools: null` bug
+
+> **Note:** kagent 0.3.9 has a bug where the controller generates agent config secrets with `tools: null` instead of `tools: []`. The pydantic validator in the agent runtime rejects this, causing agent pods to crash. The demo script applies this workaround automatically, but if running manually:
+
+```bash
+# Scale down the controller to prevent it from overwriting the fix
+kubectl scale deploy kagent-controller -n kagent --replicas=0
+sleep 5
+
+# Patch each agent secret that has tools:null
+for AGENT in product-agent order-agent complaint-agent returns-agent; do
+  NEW_B64=$(kubectl get secret "$AGENT" -n kagent -o jsonpath='{.data.config\.json}' \
+    | base64 -d \
+    | python3 -c "
+import sys, json, base64
+d = json.loads(sys.stdin.buffer.read(), strict=False)
+for t in (d.get('sse_tools') or []):
+    if t.get('tools') is None:
+        t['tools'] = []
+print(base64.b64encode(json.dumps(d).encode()).decode())
+")
+  kubectl patch secret "$AGENT" -n kagent --type='json' \
+    -p="[{\"op\":\"replace\",\"path\":\"/data/config.json\",\"value\":\"${NEW_B64}\"}]"
+  kubectl delete pod -n kagent -l "app.kubernetes.io/name=$AGENT"
+done
+
+# Scale the controller back up
+kubectl scale deploy kagent-controller -n kagent --replicas=1
+```
+
+### Wait for agents to be ready
+
+```bash
+# Wait for all agents to report Accepted and Ready
+kubectl get agents -n kagent -o wide
+# All agents should show ACCEPTED=True and READY=True
+# This may take 1-2 minutes after the workaround
+```
+
 ### Verify
 
 ```bash
@@ -935,6 +976,10 @@ kubectl get modelconfig -n kagent -o yaml
 # RemoteMCPServers discovered tools
 kubectl get remotemcpserver -n kagent
 
+# Wait for kagent controller to be ready before testing chat
+kubectl exec -n cloud-cart-support deploy/support-service -- \
+  curl -sf -o /dev/null "http://kagent-controller.kagent.svc:8083/health"
+
 # Router agent card via A2A
 kubectl port-forward svc/kagent-controller -n kagent 8083:8083 &
 sleep 2
@@ -942,9 +987,10 @@ curl -s localhost:8083/api/a2a/kagent/router-agent/.well-known/agent.json | jq .
 kill %1 2>/dev/null
 
 # Chat still works (now via kagent A2A)
+# Note: avoid PII in the message — the prompt guard from Step 2 will block it
 curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
-  -d '{"message": "Where is my order ORD-2024-0003?", "customer_id": "CUST-003"}' | jq .
+  -d '{"message": "Hello, what can you help me with?"}' | jq .
 ```
 
 > **Demo talking point:** Show the massive code reduction — 3,400 lines of Java replaced by ~150 lines of code + YAML CRDs. Agent definitions are now visible with `kubectl get agents`. System prompt changes are `kubectl edit agent order-agent` — no rebuild needed. All gateway policies (prompt guards, rate limits, observability) still apply because kagent routes through agentgateway.
