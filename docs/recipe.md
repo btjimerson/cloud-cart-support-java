@@ -14,6 +14,7 @@ A step-by-step walkthrough for demonstrating progressive migration from in-app A
 - [Step 5: Observability](#step-5-observability)
 - [Step 6: MCP Federation](#step-6-mcp-federation)
 - [Step 7: Declarative Agents](#step-7-declarative-agents)
+- [Step 8: Agent Tracing](#step-8-agent-tracing)
 - [Cleanup](#cleanup)
 - [Troubleshooting](#troubleshooting)
 
@@ -1005,6 +1006,49 @@ kubectl get agent router-agent -n kagent -o yaml
 # Show the massive code reduction
 git diff --stat demo/step-6-mcp-federation
 ```
+
+---
+
+## Step 8: Agent Tracing
+
+**Branch:** `demo/step-8-agent-tracing`
+
+### Current State
+
+All agents are deployed as kagent CRDs and running successfully. The kagent Enterprise UI includes built-in tracing that captures every agent interaction automatically — no code instrumentation needed.
+
+### What to Show
+
+Review execution traces in the kagent Enterprise UI to demonstrate end-to-end observability of the agent system.
+
+### Commands
+
+```bash
+git checkout demo/step-8-agent-tracing
+
+# Generate a request that exercises agent delegation and MCP tools
+GATEWAY_IP=$(kubectl get gateway cloud-cart-gateway -n kgateway-system -o jsonpath='{.status.addresses[0].value}')
+curl -s -X POST "http://$GATEWAY_IP/chat" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What products do you have in electronics?"}' | jq .
+
+# Port-forward the kagent Enterprise UI
+kubectl port-forward svc/solo-enterprise-ui -n kagent 4000:80 &
+open http://localhost:4000
+```
+
+### Walkthrough
+
+1. Click **Tracing** in the left navigation menu
+2. Find the trace for the request just sent
+3. Click the trace to expand the full execution flow:
+   - Router agent receives the user message
+   - Router delegates to product-agent via A2A
+   - Product-agent calls catalog-service MCP tools
+   - Response flows back through the agent chain
+4. Each span shows: LLM model, token usage, tool calls, and latency
+
+> **Demo talking point:** Every agent interaction is automatically traced — no code instrumentation needed. kagent captures the full delegation chain, tool invocations, and LLM calls. Combined with the gateway's observability policy from Step 5, you get end-to-end visibility from the user request through every agent and tool call.
 
 ---
 

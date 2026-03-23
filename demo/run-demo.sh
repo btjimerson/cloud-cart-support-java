@@ -657,7 +657,54 @@ print(base64.b64encode(json.dumps(d).encode()).decode())
   run_show "Agents" kubectl get agents -n kagent
   run_show "Code reduction" git diff --stat demo/step-6-mcp-federation
 
-  wait_for_user "Step 8 - Cleanup"
+  wait_for_user "Step 8 - Agent Tracing"
+}
+
+# ---------------------------------------------------------------------------
+# Step 8: Agent Tracing
+# ---------------------------------------------------------------------------
+step_8() {
+  banner "Step 8: Agent Tracing"
+  info "View agent execution traces in the kagent Enterprise UI."
+  info "Every LLM call, tool invocation, and agent delegation is automatically captured."
+
+  label "Deploying (branch: demo/step-8-agent-tracing)"
+  git checkout demo/step-8-agent-tracing
+
+  resolve_gateway_ip
+
+  label "Generate a traced request"
+  run_show "Chat request (generates trace)" curl -s -X POST "http://$GATEWAY_IP/chat" \
+    -H "Content-Type: application/json" \
+    -d '{"message": "What products do you have in electronics?"}'
+
+  label "Launch kagent Enterprise UI"
+  info "Port-forwarding kagent Enterprise UI to localhost:4000..."
+  kubectl port-forward svc/solo-enterprise-ui -n kagent 4000:80 &>/dev/null &
+  local PF_PID=$!
+  sleep 2
+  open http://localhost:4000 2>/dev/null || info "Open http://localhost:4000 in your browser"
+
+  info ""
+  info "In the kagent UI:"
+  info "  1. Click 'Tracing' in the left navigation menu"
+  info "  2. Find the trace for the request just sent"
+  info "  3. Click the trace to see the full execution flow:"
+  info "     - Router agent receives the user message"
+  info "     - Router delegates to product-agent via A2A"
+  info "     - Product-agent calls catalog-service MCP tools"
+  info "     - Response flows back through the agent chain"
+  info "  4. Each span shows: LLM model, token usage, tool calls, and latency"
+
+  label "Demo talking points"
+  info "Every agent interaction is automatically traced — no code instrumentation needed."
+  info "kagent captures the full delegation chain, tool invocations, and LLM calls."
+  info "Combined with the gateway observability from Step 5, you get end-to-end visibility."
+
+  wait_for_user "Cleanup"
+
+  # Clean up port-forward
+  kill $PF_PID 2>/dev/null || true
 }
 
 # ---------------------------------------------------------------------------
@@ -679,7 +726,7 @@ if [ "$SKIP_INFRA" != "true" ]; then
 fi
 
 # Run steps
-for step in $(seq "$START_STEP" 7); do
+for step in $(seq "$START_STEP" 8); do
   "step_$step"
 done
 
