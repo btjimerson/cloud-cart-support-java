@@ -22,7 +22,7 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: KAGENT_A2A_URL
+            - name: KAGENT_A2A_BASE_URL
               value: "http://kagent-controller.kagent.svc:8083"
             - name: KAGENT_NAMESPACE
               value: "kagent"
