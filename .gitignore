@@ -37,3 +37,4 @@ build/
 ### Env ###
 .env
 .envrc
+.claude/worktrees/
