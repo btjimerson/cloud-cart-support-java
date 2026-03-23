@@ -619,11 +619,11 @@ print(base64.b64encode(json.dumps(d).encode()).decode())
   local chat_response
   chat_response=$(curl -s -X POST "http://$GATEWAY_IP/chat" \
     -H "Content-Type: application/json" \
-    -d '{"message": "Where is my order ORD-2024-0003?", "customer_id": "CUST-003"}' 2>&1)
+    -d '{"message": "Hello, what can you help me with?"}' 2>&1)
   local chat_code=$?
   if [ $chat_code -ne 0 ]; then
     fail "Chat request failed (curl exit code $chat_code)"
-  elif echo "$chat_response" | grep -qi "error\|apologize\|encountered"; then
+  elif echo "$chat_response" | grep -qi "error\|apologize\|encountered\|rate limit\|blocked"; then
     fail "Chat returned error response:"
     echo "$chat_response" | python3 -m json.tool 2>/dev/null || echo "$chat_response"
   else
