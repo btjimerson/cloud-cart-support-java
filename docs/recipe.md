@@ -565,10 +565,9 @@ k8s/deploy.sh
 kubectl get agentgatewaypolicy -n agentgateway-system
 
 # Chat still works (gateway enforces model)
-# Note: avoid PII in the message — the prompt guard from Step 2 will block it
 curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
-  -d '{"message": "What products do you have in electronics?"}' | jq .
+  -d '{"message": "Can you track order ORD-2024-0003?", "customer_id": "CUST-003"}' | jq .
 ```
 
 > **Demo talking point:** Model upgrades are now a `kubectl apply` — change one YAML field and every app behind the gateway uses the new model. No code changes, no redeployments.
@@ -818,10 +817,10 @@ curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "What products do you have in electronics?", "customer_id": "CUST-001"}' | jq .
 
-# Product search (requires catalog-service MCP tools)
+# Order lookup (requires orders-service MCP tools)
 curl -s -X POST http://$GATEWAY_IP/chat \
   -H "Content-Type: application/json" \
-  -d '{"message": "What headphones do you have available?"}' | jq .
+  -d '{"message": "Can you track order ORD-2024-0003?", "customer_id": "CUST-003"}' | jq .
 ```
 
 > **Demo talking point:** The application now has a single MCP connection. Adding a new MCP server is `kubectl apply` of a new AgentgatewayBackend — no application changes needed. The gateway handles discovery, routing, and governance of all MCP tools.

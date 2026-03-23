@@ -403,7 +403,7 @@ step_3() {
   run_test "Policy created" kubectl get agentgatewaypolicy -n agentgateway-system
   run_test "Chat works (gateway enforces model)" curl -sf -X POST "http://$GATEWAY_IP/chat" \
     -H "Content-Type: application/json" \
-    -d '{"message": "What products do you have in electronics?"}'
+    -d '{"message": "Can you track order ORD-2024-0003?", "customer_id": "CUST-003"}'
 
   label "Demo talking points"
   info "Model upgrades are kubectl apply. One YAML field change and every"
@@ -504,7 +504,7 @@ step_6() {
     -d '{"message": "What products do you have in electronics?", "customer_id": "CUST-001"}'
   run_test "Order lookup (MCP tools)" curl -sf -X POST "http://$GATEWAY_IP/chat" \
     -H "Content-Type: application/json" \
-    -d '{"message": "What headphones do you have available?"}'
+    -d '{"message": "Can you track order ORD-2024-0003?", "customer_id": "CUST-003"}'
 
   label "Demo talking points"
   info "App has a single MCP connection. Adding a new MCP server is kubectl apply."
