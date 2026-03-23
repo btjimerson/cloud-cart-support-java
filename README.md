@@ -469,6 +469,7 @@ cp .env.example .env
 | 5 | `demo/step-5-observability` | Prometheus metrics and tracing (zero code changes) |
 | 6 | `demo/step-6-mcp-federation` | 4 MCP connections consolidated behind gateway |
 | 7 | `demo/step-7-declarative-agents` | Java agents replaced with kagent Kubernetes CRDs |
+| 8 | `demo/step-8-agent-tracing` | Review agent execution traces in kagent Enterprise UI |
 
 For the full recipe with architecture diagrams and talking points, see [docs/recipe.md](docs/recipe.md).
 
