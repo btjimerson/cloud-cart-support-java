@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - "**"
-      - "!demo/step-8-cleanup"
+      - "!demo/cleanup"
   pull_request:
     branches: [main]
 
