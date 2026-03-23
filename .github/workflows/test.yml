@@ -2,7 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: ["**"]
+    branches:
+      - "**"
+      - "!demo/step-8-cleanup"
   pull_request:
     branches: [main]
 
