@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'demo/**'
+      - '!demo/step-8-cleanup'
 
 env:
   REGISTRY: ghcr.io
