@@ -514,7 +514,7 @@ step_7() {
   info "Agent definitions, system prompts, and tool bindings become YAML."
 
   # Ensure kagent is installed
-  if ! kubectl get crd agents.kagent.dev &>/dev/null; then
+  if ! kubectl get crd agents.kagent.dev &>/dev/null || ! kubectl get ns kagent &>/dev/null; then
     install_kagent
   fi
 
