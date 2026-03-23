@@ -41,7 +41,7 @@ This one-time setup installs the platform infrastructure needed for all demo ste
 source .env
 ```
 
-This exports `ANTHROPIC_API_KEY`, `ENTERPRISE_AGENTGATEWAY_LICENSE_KEY`, `ENTERPRISE_KGATEWAY_LICENSE_KEY`, and version variables.
+This exports `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `ENTERPRISE_AGENTGATEWAY_LICENSE_KEY`, `ENTERPRISE_KGATEWAY_LICENSE_KEY`, and version variables. The `OPENAI_API_KEY` is required by kagent's default model config (set via helm values `providers.openAI.apiKey`).
 
 ### 2. Install Gateway API CRDs
 
@@ -141,6 +141,10 @@ proxy:
   url: "http://agentgateway.agentgateway-system.svc:8080"
 ui:
   enabled: true
+providers:
+  default: openAI
+  openAI:
+    apiKey: ${OPENAI_API_KEY}
 VALS
 helm upgrade -i kagent \
   oci://us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts/kagent-enterprise \
