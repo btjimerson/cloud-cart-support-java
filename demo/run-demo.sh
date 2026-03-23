@@ -529,6 +529,32 @@ step_7() {
   run_test "Agents as K8s resources" kubectl get agents -n kagent
   run_test "ModelConfig" kubectl get modelconfig -n kagent
   run_test "RemoteMCPServers" kubectl get remotemcpserver -n kagent
+
+  label "Waiting for all agents to be accepted"
+  local max_wait=120 elapsed=0
+  while [ $elapsed -lt $max_wait ]; do
+    local total accepted
+    total=$(kubectl get agents -n kagent --no-headers 2>/dev/null | wc -l | tr -d ' ')
+    accepted=$(kubectl get agents -n kagent --no-headers 2>/dev/null | awk '$NF == "True"' | wc -l | tr -d ' ')
+    if [ "$total" -gt 0 ] && [ "$accepted" -eq "$total" ]; then
+      success "All $total agents accepted"
+      break
+    fi
+    echo -e "  ${DIM}...waiting ($accepted/$total accepted, ${elapsed}s)${RESET}"
+    sleep 10
+    elapsed=$((elapsed + 10))
+  done
+  if [ $elapsed -ge $max_wait ]; then
+    fail "Not all agents accepted after ${max_wait}s"
+    run_show "Agent status" kubectl get agents -n kagent
+    # Show details for non-accepted agents
+    for agent in $(kubectl get agents -n kagent --no-headers | awk '$NF != "True" {print $1}'); do
+      info "--- $agent ---"
+      kubectl get agent "$agent" -n kagent -o jsonpath='{.status.conditions[*].message}' 2>/dev/null
+      echo ""
+    done
+  fi
+
   run_test "Chat via A2A" curl -sf -X POST "http://$GATEWAY_IP/chat" \
     -H "Content-Type: application/json" \
     -d '{"message": "Where is my order ORD-2024-0003?", "customer_id": "CUST-003"}'
