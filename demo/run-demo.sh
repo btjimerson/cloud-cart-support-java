@@ -547,10 +547,70 @@ step_7() {
   if [ $elapsed -ge $max_wait ]; then
     fail "Not all agents accepted after ${max_wait}s"
     run_show "Agent status" kubectl get agents -n kagent
-    # Show details for non-accepted agents
     for agent in $(kubectl get agents -n kagent --no-headers | awk '$NF != "True" {print $1}'); do
       info "--- $agent ---"
       kubectl get agent "$agent" -n kagent -o jsonpath='{.status.conditions[*].message}' 2>/dev/null
+      echo ""
+    done
+  fi
+
+  # Workaround for kagent 0.3.9 bug: controller generates tools:null instead of
+  # tools:[] in agent config secrets, causing pydantic validation failure.
+  # Fix: patch secrets, restart pods, then wait for Ready.
+  label "Applying kagent tools:null workaround (0.3.9 bug)"
+  info "Patching agent config secrets: tools:null -> tools:[]"
+  kubectl scale deploy kagent-controller -n kagent --replicas=0 --timeout=30s 2>/dev/null
+  sleep 5
+  local patched=false
+  for agent_name in $(kubectl get agents -n kagent --no-headers | awk '{print $1}'); do
+    local has_null
+    has_null=$(kubectl get secret "$agent_name" -n kagent -o jsonpath='{.data.config\.json}' 2>/dev/null \
+      | base64 -d 2>/dev/null \
+      | python3 -c "import sys,json; d=json.loads(sys.stdin.buffer.read(),strict=False); has=any(t.get('tools') is None for t in (d.get('sse_tools') or [])); print('yes' if has else 'no')" 2>/dev/null || echo "skip")
+    if [ "$has_null" = "yes" ]; then
+      local new_b64
+      new_b64=$(kubectl get secret "$agent_name" -n kagent -o jsonpath='{.data.config\.json}' \
+        | base64 -d \
+        | python3 -c "
+import sys, json, base64
+d = json.loads(sys.stdin.buffer.read(), strict=False)
+for t in (d.get('sse_tools') or []):
+    if t.get('tools') is None:
+        t['tools'] = []
+print(base64.b64encode(json.dumps(d).encode()).decode())
+")
+      kubectl patch secret "$agent_name" -n kagent --type='json' \
+        -p="[{\"op\":\"replace\",\"path\":\"/data/config.json\",\"value\":\"${new_b64}\"}]" &>/dev/null
+      kubectl delete pod -n kagent -l "app.kubernetes.io/name=$agent_name" &>/dev/null
+      success "Patched $agent_name"
+      patched=true
+    fi
+  done
+  if [ "$patched" = false ]; then
+    info "No agents needed patching"
+  fi
+  kubectl scale deploy kagent-controller -n kagent --replicas=1 --timeout=30s 2>/dev/null
+
+  label "Waiting for all agents to be ready"
+  max_wait=180 elapsed=0
+  while [ $elapsed -lt $max_wait ]; do
+    local total ready
+    total=$(kubectl get agents -n kagent --no-headers 2>/dev/null | wc -l | tr -d ' ')
+    ready=$(kubectl get agents -n kagent --no-headers 2>/dev/null | awk '$3 == "True"' | wc -l | tr -d ' ')
+    if [ "$total" -gt 0 ] && [ "$ready" -eq "$total" ]; then
+      success "All $total agents ready"
+      break
+    fi
+    echo -e "  ${DIM}...waiting ($ready/$total ready, ${elapsed}s)${RESET}"
+    sleep 10
+    elapsed=$((elapsed + 10))
+  done
+  if [ $elapsed -ge $max_wait ]; then
+    fail "Not all agents ready after ${max_wait}s"
+    run_show "Agent status" kubectl get agents -n kagent -o wide
+    for agent_name in $(kubectl get agents -n kagent --no-headers | awk '$3 != "True" {print $1}'); do
+      info "--- $agent_name ---"
+      kubectl describe agent "$agent_name" -n kagent | tail -10
       echo ""
     done
   fi
