@@ -194,6 +194,11 @@ VALS
 install_kagent() {
   banner "Installing kagent (for Step 7)"
 
+  if [ -z "${ENTERPRISE_KAGENT_LICENSE_KEY:-}" ]; then
+    read -rsp "Enter ENTERPRISE_KAGENT_LICENSE_KEY (leave blank for versions that don't require one): " ENTERPRISE_KAGENT_LICENSE_KEY; echo
+  fi
+  export ENTERPRISE_KAGENT_LICENSE_KEY
+
   label "Management plane"
   cat <<VALS > /tmp/kagent-mgmt-values.yaml
 cluster: $(kubectl config current-context)
@@ -239,11 +244,16 @@ proxy:
 ui:
   enabled: true
 VALS
+  local license_args=()
+  if [ -n "${ENTERPRISE_KAGENT_LICENSE_KEY:-}" ]; then
+    license_args=(--set "licensing.licenseKey=${ENTERPRISE_KAGENT_LICENSE_KEY}")
+  fi
   helm upgrade -i kagent \
     oci://us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts/kagent-enterprise \
     -n kagent \
     --version "${ENTERPRISE_KAGENT_VERSION}" \
-    --values /tmp/kagent-values.yaml 2>&1 | tail -3
+    --values /tmp/kagent-values.yaml \
+    "${license_args[@]}" 2>&1 | tail -3
   rm -f /tmp/kagent-values.yaml
 
   label "Verifying kagent"
