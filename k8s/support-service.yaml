@@ -20,6 +20,7 @@ spec:
       containers:
         - name: support-service
           image: ghcr.io/btjimerson/cloud-cart-support-java/support-service:step-3-model-config
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
