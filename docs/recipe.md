@@ -973,43 +973,12 @@ git checkout demo/step-7-declarative-agents
 k8s/deploy.sh
 ```
 
-### kagent 0.3.9 workaround: `tools: null` bug
-
-> **Note:** kagent 0.3.9 has a bug where the controller generates agent config secrets with `tools: null` instead of `tools: []`. The pydantic validator in the agent runtime rejects this, causing agent pods to crash. The demo script applies this workaround automatically, but if running manually:
-
-```bash
-# Scale down the controller to prevent it from overwriting the fix
-kubectl scale deploy kagent-controller -n kagent --replicas=0
-sleep 5
-
-# Patch each agent secret that has tools:null
-for AGENT in product-agent order-agent complaint-agent returns-agent; do
-  NEW_B64=$(kubectl get secret "$AGENT" -n kagent -o jsonpath='{.data.config\.json}' \
-    | base64 -d \
-    | python3 -c "
-import sys, json, base64
-d = json.loads(sys.stdin.buffer.read(), strict=False)
-for t in (d.get('sse_tools') or []):
-    if t.get('tools') is None:
-        t['tools'] = []
-print(base64.b64encode(json.dumps(d).encode()).decode())
-")
-  kubectl patch secret "$AGENT" -n kagent --type='json' \
-    -p="[{\"op\":\"replace\",\"path\":\"/data/config.json\",\"value\":\"${NEW_B64}\"}]"
-  kubectl delete pod -n kagent -l "app.kubernetes.io/name=$AGENT"
-done
-
-# Scale the controller back up
-kubectl scale deploy kagent-controller -n kagent --replicas=1
-```
-
 ### Wait for agents to be ready
 
 ```bash
 # Wait for all agents to report Accepted and Ready
 kubectl get agents -n kagent -o wide
 # All agents should show ACCEPTED=True and READY=True
-# This may take 1-2 minutes after the workaround
 ```
 
 ### Verify
