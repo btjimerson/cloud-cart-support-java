@@ -38,10 +38,25 @@ This one-time setup installs the platform infrastructure needed for all demo ste
 ### 1. Load environment variables
 
 ```bash
-source .env
+# Copy the example env file and fill in your values
+cp .env.example .env
 ```
 
-This exports `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `ENTERPRISE_AGENTGATEWAY_LICENSE_KEY`, `ENTERPRISE_KGATEWAY_LICENSE_KEY`, and version variables. The `OPENAI_API_KEY` is required by kagent's default model config (set via helm values `providers.openAI.apiKey`).
+Edit `.env` and set the required values:
+
+- `ANTHROPIC_API_KEY` — your Anthropic API key
+- `OPENAI_API_KEY` — required by kagent's default model config
+- `ENTERPRISE_AGENTGATEWAY_LICENSE_KEY` — Solo Enterprise Agent Gateway license
+- `ENTERPRISE_KGATEWAY_LICENSE_KEY` — Solo Enterprise kgateway license
+- `ENTERPRISE_KAGENT_LICENSE_KEY` — Solo Enterprise kagent license
+
+Version variables (`ENTERPRISE_AGENTGATEWAY_VERSION`, `ENTERPRISE_KGATEWAY_VERSION`, `ENTERPRISE_KAGENT_VERSION`) have defaults you can override.
+
+Then load them:
+
+```bash
+source .env
+```
 
 ### 2. Install Gateway API CRDs
 
