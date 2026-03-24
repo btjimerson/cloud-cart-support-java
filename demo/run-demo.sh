@@ -94,7 +94,7 @@ setup_env() {
   # Defaults for versions
   : "${ENTERPRISE_AGENTGATEWAY_VERSION:=2.2.0-beta.4}"
   : "${ENTERPRISE_KGATEWAY_VERSION:=2.1.2}"
-  : "${ENTERPRISE_KAGENT_VERSION:=0.3.9}"
+  : "${ENTERPRISE_KAGENT_VERSION:=0.3.11}"
 
   # Prompt for missing secrets
   if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
