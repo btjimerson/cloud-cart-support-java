@@ -248,8 +248,6 @@ VALS
 
   label "kagent control plane"
   cat <<VALS > /tmp/kagent-values.yaml
-proxy:
-  url: "http://agentgateway.agentgateway-system.svc:8080"
 ui:
   enabled: true
 providers:
