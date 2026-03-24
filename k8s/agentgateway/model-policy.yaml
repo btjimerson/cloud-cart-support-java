@@ -12,7 +12,7 @@ spec:
     ai:
       defaults:
         - field: temperature
-          value: "0.7"
+          value: 0.7
       overrides:
         - field: max_tokens
           value: 4096
