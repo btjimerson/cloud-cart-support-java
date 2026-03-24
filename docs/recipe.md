@@ -156,6 +156,13 @@ providers:
   default: openAI
   openAI:
     apiKey: ${OPENAI_API_KEY}
+otel:
+  tracing:
+    enabled: true
+    exporter:
+      otlp:
+        endpoint: solo-enterprise-ui.kagent.svc.cluster.local:4317
+        insecure: true
 VALS
 helm upgrade -i kagent \
   oci://us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts/kagent-enterprise \
