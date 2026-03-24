@@ -198,10 +198,10 @@ VALS
 }
 
 # ---------------------------------------------------------------------------
-# kagent install (Step 7 only)
+# kagent install
 # ---------------------------------------------------------------------------
 install_kagent() {
-  banner "Installing kagent (for Step 7)"
+  banner "Installing kagent"
 
   if [ -z "${ENTERPRISE_KAGENT_LICENSE_KEY:-}" ]; then
     read -rsp "Enter ENTERPRISE_KAGENT_LICENSE_KEY (leave blank for versions that don't require one): " ENTERPRISE_KAGENT_LICENSE_KEY; echo
@@ -525,11 +525,6 @@ step_7() {
   info "Replace all Java agent orchestration (~3,400 lines) with kagent CRDs."
   info "Agent definitions, system prompts, and tool bindings become YAML."
 
-  # Ensure kagent is installed
-  if ! kubectl get crd agents.kagent.dev &>/dev/null || ! kubectl get ns kagent &>/dev/null; then
-    install_kagent
-  fi
-
   label "Deploying (branch: demo/step-7-declarative-agents)"
   git checkout demo/step-7-declarative-agents
   k8s/deploy.sh
@@ -729,6 +724,13 @@ if [ "$SKIP_INFRA" != "true" ]; then
     info "Set SKIP_INFRA=true to always skip, or press Enter to continue."
   else
     install_infra
+  fi
+
+  label "kagent check"
+  if kubectl get crd agents.kagent.dev &>/dev/null && kubectl get ns kagent &>/dev/null; then
+    success "kagent already installed"
+  else
+    install_kagent
   fi
 fi
 
