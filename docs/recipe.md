@@ -137,8 +137,6 @@ helm upgrade -i kagent-crds \
 # Install kagent control plane (with UI and agentgateway proxy)
 # Note: kagent 0.3.10+ requires a license key via licensing.licenseKey
 cat <<VALS > /tmp/kagent-values.yaml
-proxy:
-  url: "http://agentgateway.agentgateway-system.svc:8080"
 ui:
   enabled: true
 providers:
