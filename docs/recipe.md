@@ -729,7 +729,9 @@ Add gateway-level observability with Prometheus metrics and OpenTelemetry tracin
 
 ```bash
 git checkout demo/step-5-observability
-k8s/deploy.sh
+
+# Only apply the observability policy — no app redeploy needed
+kubectl apply -f k8s/agentgateway/ --recursive
 ```
 
 ### Verify
