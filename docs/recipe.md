@@ -61,7 +61,7 @@ source .env
 ### 2. Install Gateway API CRDs
 
 ```bash
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
 ```
 
 ### 3. Install Solo Enterprise for kgateway (ingress)
@@ -1142,7 +1142,7 @@ kubectl delete namespace kgateway-system --ignore-not-found
 kubectl get crds -o name | grep 'solo\|agentgateway' | xargs kubectl delete --ignore-not-found
 
 # Remove Gateway API CRDs
-kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml
+kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
 
 # Return to main branch
 git checkout main
