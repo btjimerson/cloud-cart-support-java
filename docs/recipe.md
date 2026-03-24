@@ -89,9 +89,7 @@ helm upgrade -i enterprise-agentgateway \
 rm /tmp/agw-values.yaml
 ```
 
-### 5. Install Solo Enterprise for Kagent (Step 7 only)
-
-> **Note:** Only install kagent if you plan to run Step 7 (Declarative Agents). Steps 0–6 do not require kagent.
+### 5. Install Solo Enterprise for Kagent
 
 ```bash
 # Install the management plane (UI, OIDC provider, telemetry, ClickHouse)
@@ -165,11 +163,17 @@ kubectl get pods -n kgateway-system
 # Agent Gateway pods
 kubectl get pods -n agentgateway-system
 
+# kagent pods
+kubectl get pods -n kagent
+
 # GatewayClasses registered
 kubectl get gatewayclasses
+
+# kagent controller running
+kubectl rollout status deploy/kagent-controller -n kagent --timeout=120s
 ```
 
-All pods should be `Running` and both `enterprise-kgateway` and `enterprise-agentgateway` GatewayClasses should show `Accepted`.
+All pods should be `Running`, both `enterprise-kgateway` and `enterprise-agentgateway` GatewayClasses should show `Accepted`, and the kagent controller should be ready.
 
 ### 7. Apply kgateway ingress resources
 
