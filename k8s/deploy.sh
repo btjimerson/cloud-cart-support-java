@@ -10,6 +10,7 @@ if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
   # Detect which namespace the secret belongs in from secret.yaml
   SECRET_NS=$(grep 'namespace:' "${SCRIPT_DIR}/secret.yaml" | awk '{print $2}')
   if [ "$SECRET_NS" = "agentgateway-system" ]; then
+    kubectl create namespace agentgateway-system --dry-run=client -o yaml | kubectl apply -f -
     kubectl create secret generic anthropic-api-key \
       -n agentgateway-system \
       --from-literal=Authorization="${ANTHROPIC_API_KEY}" \
