@@ -165,10 +165,10 @@ install_infra() {
     --set licensing.licenseKey="${ENTERPRISE_KGATEWAY_LICENSE_KEY}" 2>&1 | tail -3
 
   label "Enterprise Agent Gateway"
-  helm upgrade -i enterprise-agentgateway-crds \
+  helm template enterprise-agentgateway-crds \
     oci://us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts/enterprise-agentgateway-crds \
-    --namespace agentgateway-system --create-namespace \
-    --version "${ENTERPRISE_AGENTGATEWAY_VERSION}" 2>&1 | tail -3
+    --version "${ENTERPRISE_AGENTGATEWAY_VERSION}" \
+    | kubectl apply --server-side --force-conflicts --validate=false -f - 2>&1 | tail -3
   kubectl create namespace agentgateway-system --dry-run=client -o yaml | kubectl apply -f -
   cat <<VALS > /tmp/agw-values.yaml
 licensing:
