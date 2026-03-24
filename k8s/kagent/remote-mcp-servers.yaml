@@ -1,0 +1,39 @@
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: orders-service
+  namespace: kagent
+spec:
+  description: Order management MCP server — tracking, status, cancellations
+  url: http://orders-service.cloud-cart-support.svc:8080/sse
+  protocol: SSE
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: catalog-service
+  namespace: kagent
+spec:
+  description: Product catalog MCP server — search, availability, recommendations
+  url: http://catalog-service.cloud-cart-support.svc:8080/sse
+  protocol: SSE
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: customers-service
+  namespace: kagent
+spec:
+  description: Customer management MCP server — profiles, support tickets
+  url: http://customers-service.cloud-cart-support.svc:8080/sse
+  protocol: SSE
+---
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: notifications-service
+  namespace: kagent
+spec:
+  description: Notification MCP server — email and SMS alerts
+  url: http://notifications-service.cloud-cart-support.svc:8080/sse
+  protocol: SSE
