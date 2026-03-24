@@ -19,7 +19,7 @@ A distributed multi-agent AI customer service system built with Spring Boot, Spr
 
 ## Background
 
-Cloud Cart Support demonstrates a distributed multi-agent architecture for AI-powered customer service. A router agent classifies incoming customer messages by intent and delegates them to the appropriate specialist agent. Each agent discovers and calls domain-specific tools exposed by independent MCP server microservices over Streamable HTTP transport.
+Cloud Cart Support demonstrates a distributed multi-agent architecture for AI-powered customer service. A router agent classifies incoming customer messages by intent and delegates them to the appropriate specialist agent. Each agent discovers and calls domain-specific tools exposed by independent MCP server microservices over SSE transport.
 
 Key features:
 
@@ -66,7 +66,7 @@ cloud-cart-support-java/
 └── notifications-service/     # MCP server: notification tools - port 8084
 ```
 
-Each MCP server service owns its data and exposes tools via Streamable HTTP transport using `spring-ai-starter-mcp-server-webflux`. The orchestrator (`support-service`) connects to all MCP servers as a client and routes discovered tools to the appropriate agents.
+Each MCP server service owns its data and exposes tools via SSE transport using `spring-ai-starter-mcp-server-webmvc`. The orchestrator (`support-service`) connects to all MCP servers as a client and routes discovered tools to the appropriate agents.
 
 ## Prerequisites
 
@@ -133,7 +133,7 @@ Install Gateway API CRDs, kgateway, and Enterprise Agent Gateway:
 
 ```sh
 # Install Gateway API CRDs
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml
 
 # Source .env for license keys and versions
 source .env
@@ -411,7 +411,7 @@ curl -s -X POST http://localhost:8080/chat \
 
 ## Automated Demo Runner
 
-An interactive script runs through the full Enterprise Agent Gateway demo (Steps 0-7) automatically. It deploys each step, runs verification tests, and waits for you to press Enter before continuing.
+An interactive script runs through the full Enterprise Agent Gateway demo (Steps 0-8) automatically. It deploys each step, runs verification tests, and waits for you to press Enter before continuing.
 
 ### Prerequisites
 
@@ -431,7 +431,7 @@ git checkout main
 The script will:
 
 1. Source `.env` if present, then prompt for any missing API keys and license keys
-2. Use default versions if not set (`kgateway 2.1.2`, `Agent Gateway 2.2.0-beta.4`, `kagent 0.3.9`)
+2. Use default versions if not set (`kgateway 2.1.2`, `Agent Gateway 2.2.0-beta.4`, `kagent 0.3.11`)
 3. Install infrastructure (Gateway API CRDs, kgateway, Agent Gateway) if not already present
 4. Run each step: check out the branch, deploy, run tests, wait for Enter
 
