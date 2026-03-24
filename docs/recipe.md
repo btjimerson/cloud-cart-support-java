@@ -364,7 +364,8 @@ graph LR
 ```bash
 git checkout demo/step-1-api-keys
 
-# Create the API key secret in agentgateway-system
+# Ensure agentgateway-system namespace exists and create the API key secret
+kubectl create namespace agentgateway-system --dry-run=client -o yaml | kubectl apply -f -
 kubectl create secret generic anthropic-api-key \
   -n agentgateway-system \
   --from-literal=Authorization="${ANTHROPIC_API_KEY}" \
