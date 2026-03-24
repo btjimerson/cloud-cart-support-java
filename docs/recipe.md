@@ -149,7 +149,7 @@ helm upgrade -i kagent \
   -n kagent \
   --version "${ENTERPRISE_KAGENT_VERSION}" \
   --values /tmp/kagent-values.yaml \
-  ${ENTERPRISE_KAGENT_LICENSE_KEY:+--set licensing.licenseKey="${ENTERPRISE_KAGENT_LICENSE_KEY}"}
+  --set licensing.licenseKey="${ENTERPRISE_KAGENT_LICENSE_KEY}"
 rm /tmp/kagent-values.yaml
 
 # Verify all kagent pods are running
