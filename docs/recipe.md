@@ -84,11 +84,11 @@ helm upgrade -i enterprise-kgateway \
 > **Note:** Enterprise kgateway and Enterprise Agent Gateway share some CRDs (extauth, ratelimit). Use `helm template` + server-side apply for the CRDs to avoid ownership conflicts, then install the control plane normally.
 
 ```bash
-# CRDs
-helm upgrade -i enterprise-agentgateway-crds \
+# CRDs (server-side apply to avoid ownership conflict with shared kgateway CRDs)
+helm template enterprise-agentgateway-crds \
   oci://us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts/enterprise-agentgateway-crds \
-  --namespace agentgateway-system --create-namespace \
-  --version "${ENTERPRISE_AGENTGATEWAY_VERSION}"
+  --version "${ENTERPRISE_AGENTGATEWAY_VERSION}" \
+  | kubectl apply --server-side --force-conflicts --validate=false -f -
 
 # Control plane (use a values file because --set/--set-string can mangle the JWT license key)
 kubectl create namespace agentgateway-system --dry-run=client -o yaml | kubectl apply -f -
