@@ -26,8 +26,6 @@ kubectl delete namespace kagent --ignore-not-found --wait=false
 # --- 3. Delete Agent Gateway CRDs and resources ---
 echo "==> Cleaning up Agent Gateway resources..."
 kubectl delete agentgatewaybackend --all -n agentgateway-system --ignore-not-found 2>/dev/null || true
-kubectl delete agentgatewaypolicy --all -n agentgateway-system --ignore-not-found 2>/dev/null || true
-kubectl delete enterpriseagentgatewaypolicy --all -n agentgateway-system --ignore-not-found 2>/dev/null || true
 kubectl delete httproute --all -n agentgateway-system --ignore-not-found 2>/dev/null || true
 kubectl delete gateway enterprise-agentgateway -n agentgateway-system --ignore-not-found 2>/dev/null || true
 kubectl delete secret anthropic-api-key -n agentgateway-system --ignore-not-found 2>/dev/null || true
