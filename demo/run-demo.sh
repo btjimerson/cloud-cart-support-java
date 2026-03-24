@@ -392,6 +392,10 @@ step_2() {
   info "82 lines of Java replaced by a YAML policy."
   info "New PII types or content rules are kubectl apply, not a code deploy."
 
+  label "Cleaning up prompt guard policy (prevents issues in later steps)"
+  kubectl delete enterpriseagentgatewaypolicy prompt-guard-policy -n agentgateway-system --ignore-not-found 2>/dev/null || true
+  success "Prompt guard policy removed"
+
   wait_for_user "Step 3 - Model Configuration"
 }
 
@@ -457,6 +461,10 @@ step_4() {
   label "Demo talking points"
   info "53 lines of Java + tests replaced by a YAML policy."
   info "Rate limits work across replicas and can be changed without code deploys."
+
+  label "Cleaning up rate limit policy (prevents issues in later steps)"
+  kubectl delete enterpriseagentgatewaypolicy rate-limit-policy -n agentgateway-system --ignore-not-found 2>/dev/null || true
+  success "Rate limit policy removed"
 
   wait_for_user "Step 5 - Observability"
 }
