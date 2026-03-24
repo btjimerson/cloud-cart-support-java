@@ -254,6 +254,13 @@ providers:
   default: openAI
   openAI:
     apiKey: ${OPENAI_API_KEY}
+otel:
+  tracing:
+    enabled: true
+    exporter:
+      otlp:
+        endpoint: solo-enterprise-ui.kagent.svc.cluster.local:4317
+        insecure: true
 VALS
   local license_args=()
   if [ -n "${ENTERPRISE_KAGENT_LICENSE_KEY:-}" ]; then
