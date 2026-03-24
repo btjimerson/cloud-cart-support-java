@@ -916,8 +916,7 @@ _Agent orchestration is Kubernetes CRDs managed by kagent_
 **CRDs added (in `k8s/kagent/`):**
 - `model-config.yaml` — ModelConfig pointing to agentgateway (`provider: OpenAI`, `baseUrl` = gateway service URL with `/v1` suffix, e.g. `http://agentgateway.agentgateway-system.svc:8080/v1`)
 - `agents.yaml` — 5 Agent CRs: router-agent (with agent-as-tool references) + 4 specialist agents (with MCP tool references and system prompts)
-
-> **Note:** RemoteMCPServer resources are auto-discovered by the kagent controller from Services with the label `kagent.dev/mcp-service: "true"`. No separate YAML file is needed.
+- `remote-mcp-servers.yaml` — 4 RemoteMCPServer CRs pointing to the application MCP services in `cloud-cart-support` namespace (orders, catalog, customers, notifications)
 
 ### Deploy
 
