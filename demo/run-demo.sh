@@ -474,9 +474,9 @@ step_5() {
   info "Add gateway-level observability with Prometheus metrics."
   info "No application code changes required."
 
-  label "Deploying (branch: demo/step-5-observability)"
+  label "Applying observability policy (branch: demo/step-5-observability)"
   git checkout demo/step-5-observability
-  k8s/deploy.sh
+  kubectl apply -f k8s/agentgateway/ --recursive
 
   resolve_gateway_ip
 
