@@ -161,7 +161,7 @@ otel:
     enabled: true
     exporter:
       otlp:
-        endpoint: solo-enterprise-telemetry-collector.kagent.svc.cluster.local:4317
+        endpoint: solo-enterprise-ui.kagent.svc.cluster.local:4317
         insecure: true
 VALS
 helm upgrade -i kagent \
