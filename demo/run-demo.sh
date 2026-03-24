@@ -259,7 +259,7 @@ otel:
     enabled: true
     exporter:
       otlp:
-        endpoint: solo-enterprise-ui.kagent.svc.cluster.local:4317
+        endpoint: solo-enterprise-telemetry-collector.kagent.svc.cluster.local:4317
         insecure: true
 VALS
   local license_args=()
