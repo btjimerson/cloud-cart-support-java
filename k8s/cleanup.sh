@@ -49,7 +49,7 @@ kubectl delete namespace kgateway-system --ignore-not-found --wait=false
 
 # --- 5. Remove Gateway API CRDs ---
 echo "==> Removing Gateway API CRDs..."
-kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml 2>/dev/null || true
+kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml 2>/dev/null || true
 
 # --- 6. Return to main branch ---
 echo "==> Returning to main branch..."
