@@ -4,9 +4,12 @@ metadata:
   name: orders-service
   namespace: kagent
 spec:
-  description: Order management MCP server — tracking, status, cancellations
-  url: http://orders-service.cloud-cart-support.svc:8080/sse
+  description: Order management MCP tool server
+  url: http://orders-service.cloud-cart-support:8080/sse
   protocol: SSE
+  sseReadTimeout: 5m0s
+  terminateOnClose: true
+  timeout: 30s
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
@@ -14,9 +17,12 @@ metadata:
   name: catalog-service
   namespace: kagent
 spec:
-  description: Product catalog MCP server — search, availability, recommendations
-  url: http://catalog-service.cloud-cart-support.svc:8080/sse
+  description: Product catalog MCP tool server
+  url: http://catalog-service.cloud-cart-support:8080/sse
   protocol: SSE
+  sseReadTimeout: 5m0s
+  terminateOnClose: true
+  timeout: 30s
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
@@ -24,9 +30,12 @@ metadata:
   name: customers-service
   namespace: kagent
 spec:
-  description: Customer management MCP server — profiles, support tickets
-  url: http://customers-service.cloud-cart-support.svc:8080/sse
+  description: Customer management MCP tool server
+  url: http://customers-service.cloud-cart-support:8080/sse
   protocol: SSE
+  sseReadTimeout: 5m0s
+  terminateOnClose: true
+  timeout: 30s
 ---
 apiVersion: kagent.dev/v1alpha2
 kind: RemoteMCPServer
@@ -34,6 +43,9 @@ metadata:
   name: notifications-service
   namespace: kagent
 spec:
-  description: Notification MCP server — email and SMS alerts
-  url: http://notifications-service.cloud-cart-support.svc:8080/sse
+  description: Notification MCP tool server
+  url: http://notifications-service.cloud-cart-support:8080/sse
   protocol: SSE
+  sseReadTimeout: 5m0s
+  terminateOnClose: true
+  timeout: 30s
