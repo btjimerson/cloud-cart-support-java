@@ -15,4 +15,4 @@ spec:
           value: "0.7"
       overrides:
         - field: max_tokens
-          value: "4096"
+          value: 4096
