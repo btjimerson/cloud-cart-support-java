@@ -914,8 +914,9 @@ _Agent orchestration is Kubernetes CRDs managed by kagent_
 
 **CRDs added (in `k8s/kagent/`):**
 - `model-config.yaml` — ModelConfig pointing to agentgateway (`provider: OpenAI`, `baseUrl` = gateway service URL with `/v1` suffix, e.g. `http://agentgateway.agentgateway-system.svc:8080/v1`)
-- `remote-mcp-servers.yaml` — 4 RemoteMCPServer resources (catalog, orders, customers, notifications)
 - `agents.yaml` — 5 Agent CRs: router-agent (with agent-as-tool references) + 4 specialist agents (with MCP tool references and system prompts)
+
+> **Note:** RemoteMCPServer resources are auto-discovered by the kagent controller from Services with the label `kagent.dev/mcp-service: "true"`. No separate YAML file is needed.
 
 ### Deploy
 
@@ -1029,7 +1030,7 @@ Review execution traces in the kagent Enterprise UI to demonstrate end-to-end ob
 git checkout demo/step-8-agent-tracing
 
 # Generate a request that exercises agent delegation and MCP tools
-GATEWAY_IP=$(kubectl get gateway cloud-cart-gateway -n kgateway-system -o jsonpath='{.status.addresses[0].value}')
+GATEWAY_IP=$(kubectl get svc cloud-cart-gateway -n kgateway-system -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 curl -s -X POST "http://$GATEWAY_IP/chat" \
   -H "Content-Type: application/json" \
   -d '{"message": "What products do you have in electronics?"}' | jq .
@@ -1081,8 +1082,8 @@ kubectl delete gateway agentgateway -n agentgateway-system --ignore-not-found
 kubectl delete secret anthropic-api-key -n agentgateway-system --ignore-not-found
 
 # Uninstall Enterprise Agent Gateway
-helm uninstall enterprise-agentgateway -n agentgateway-system
-helm uninstall enterprise-agentgateway-crds -n agentgateway-system
+helm uninstall enterprise-agentgateway -n agentgateway-system || true
+helm uninstall enterprise-agentgateway-crds -n agentgateway-system || true
 kubectl delete namespace agentgateway-system --ignore-not-found
 
 # Delete kgateway resources
@@ -1091,8 +1092,8 @@ kubectl delete httproute --all -n cloud-cart-support --ignore-not-found
 kubectl delete httplistenerpolicy --all -n kgateway-system --ignore-not-found
 
 # Uninstall Enterprise kgateway
-helm uninstall enterprise-kgateway -n kgateway-system
-helm uninstall enterprise-kgateway-crds -n kgateway-system
+helm uninstall enterprise-kgateway -n kgateway-system || true
+helm uninstall enterprise-kgateway-crds -n kgateway-system || true
 kubectl delete namespace kgateway-system --ignore-not-found
 
 # Remove leftover Solo/agentgateway CRDs
