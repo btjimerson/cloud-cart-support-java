@@ -524,6 +524,14 @@ cat k8s/agentgateway/policy.yaml
 git diff demo/step-1-api-keys -- support-service/src/ | head -50
 ```
 
+### Cleanup
+
+Remove the prompt guard policy after demonstrating — it can block legitimate requests in later steps:
+
+```bash
+kubectl delete enterpriseagentgatewaypolicy prompt-guard-policy -n agentgateway-system --ignore-not-found
+```
+
 ---
 
 ## Step 3: Model Configuration
@@ -678,6 +686,14 @@ cat k8s/agentgateway/rate-limit-policy.yaml
 
 # Show removed code
 git diff demo/step-3-model-config -- support-service/src/ | head -50
+```
+
+### Cleanup
+
+Remove the rate limit policy after demonstrating — it causes 429 errors in later steps:
+
+```bash
+kubectl delete enterpriseagentgatewaypolicy rate-limit-policy -n agentgateway-system --ignore-not-found
 ```
 
 ---
@@ -1077,10 +1093,8 @@ helm uninstall kagent-mgmt -n kagent || true
 kubectl get crds -o name | grep kagent | xargs kubectl delete --ignore-not-found
 kubectl delete namespace kagent --ignore-not-found
 
-# Delete Agent Gateway CRDs (policies, backends, routes)
+# Delete Agent Gateway CRDs (backends, routes)
 kubectl delete agentgatewaybackend --all -n agentgateway-system --ignore-not-found
-kubectl delete agentgatewaypolicy --all -n agentgateway-system --ignore-not-found
-kubectl delete enterpriseagentgatewaypolicy --all -n agentgateway-system --ignore-not-found
 kubectl delete httproute --all -n agentgateway-system --ignore-not-found
 kubectl delete gateway agentgateway -n agentgateway-system --ignore-not-found
 kubectl delete secret anthropic-api-key -n agentgateway-system --ignore-not-found
