@@ -151,7 +151,7 @@ install_infra() {
   banner "Installing Infrastructure"
 
   label "Gateway API CRDs"
-  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml 2>&1 | tail -3
+  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml 2>&1 | tail -3
 
   label "Enterprise kgateway"
   helm upgrade -i enterprise-kgateway-crds \
