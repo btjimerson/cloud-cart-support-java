@@ -31,11 +31,24 @@ spec:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: orders-service
+          toolNames:
+            - getOrderStatus
+            - listCustomerOrders
+            - getTrackingInfo
+            - cancelOrder
+            - checkReturnEligibility
+            - initiateReturn
+            - generateReturnLabel
       - type: McpServer
         mcpServer:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: notifications-service
+          toolNames:
+            - sendEmail
+            - sendSms
+            - createSupportTicket
+            - escalateToSupervisor
     a2aConfig:
       skills:
         - id: order-management
@@ -80,6 +93,11 @@ spec:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: catalog-service
+          toolNames:
+            - searchProducts
+            - getProductDetails
+            - checkAvailability
+            - getRecommendations
     a2aConfig:
       skills:
         - id: product-search
@@ -131,11 +149,24 @@ spec:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: orders-service
+          toolNames:
+            - getOrderStatus
+            - listCustomerOrders
+            - getTrackingInfo
+            - cancelOrder
+            - checkReturnEligibility
+            - initiateReturn
+            - generateReturnLabel
       - type: McpServer
         mcpServer:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: customers-service
+          toolNames:
+            - getCustomerInfo
+            - getLoyaltyPoints
+            - addInteractionNote
+            - issueCredit
     a2aConfig:
       skills:
         - id: returns-refunds
@@ -185,11 +216,21 @@ spec:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: customers-service
+          toolNames:
+            - getCustomerInfo
+            - getLoyaltyPoints
+            - addInteractionNote
+            - issueCredit
       - type: McpServer
         mcpServer:
           apiGroup: kagent.dev
           kind: RemoteMCPServer
           name: notifications-service
+          toolNames:
+            - sendEmail
+            - sendSms
+            - createSupportTicket
+            - escalateToSupervisor
     a2aConfig:
       skills:
         - id: complaint-resolution
